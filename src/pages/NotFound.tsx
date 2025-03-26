@@ -32,7 +32,7 @@ const NotFound = () => {
           Oops! The page you're looking for doesn't exist.
         </p>
         <Button onClick={handleNavigateHome} className="bg-navy hover:bg-navy-dark transition-colors">
-          Return to Dashboard
+          {isAuthenticated ? "Return to Dashboard" : "Go to Login"}
         </Button>
       </div>
     </div>

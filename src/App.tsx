@@ -23,19 +23,28 @@ const App = () => (
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
             
-            <Route 
-              path="/dashboard/:role" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/dashboard/:role" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
             
-            {/* For history, users, settings routes - these would be implemented similarly */}
-            <Route path="/history/:role" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
-            <Route path="/users/:role" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
-            <Route path="/settings/:role" element={<ProtectedRoute><NotFound /></ProtectedRoute>} />
+            {/* These routes would be implemented when needed */}
+            <Route path="/history/:role" element={
+              <ProtectedRoute>
+                <NotFound />
+              </ProtectedRoute>
+            } />
+            <Route path="/users/:role" element={
+              <ProtectedRoute>
+                <NotFound />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings/:role" element={
+              <ProtectedRoute>
+                <NotFound />
+              </ProtectedRoute>
+            } />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
