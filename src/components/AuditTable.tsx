@@ -1,10 +1,25 @@
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface AuditData {
   id: string;
@@ -37,7 +52,7 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   const { user } = useAuth();
   const role = user?.role as UserRole;
   
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   
   const handlePageChange = (page: number) => {
@@ -88,129 +103,116 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="w-full overflow-auto">
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy"></div>
+        <div className="flex justify-center items-center h-48">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-navy"></div>
         </div>
       ) : (
         <>
-          <table className="audit-table">
-            <thead>
-              <tr>
-                {columns.map((column) => (
-                  <th key={column.key}>{column.title}</th>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableHead key={column.key} className="whitespace-nowrap font-semibold text-sm">
+                      {column.title}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentItems.map((item) => (
+                  <TableRow key={item.id}>
+                    {columns.map((column) => {
+                      if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
+                        return (
+                          <TableCell key={`${item.id}-${column.key}`}>
+                            <Select 
+                              defaultValue={item.allocation} 
+                              onValueChange={(value) => handleAllocationChange(item.id, value)}
+                            >
+                              <SelectTrigger className="w-[140px] h-8 text-xs">
+                                <SelectValue placeholder="Select" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="ro_admin_1">RO Admin 1</SelectItem>
+                                <SelectItem value="ro_admin_2">RO Admin 2</SelectItem>
+                                <SelectItem value="ro_admin_3">RO Admin 3</SelectItem>
+                                <SelectItem value="desk_auditor_1">Desk Auditor 1</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                        );
+                      }
+                      
+                      if (column.key === 'fieldReport') {
+                        return (
+                          <TableCell key={`${item.id}-${column.key}`}>
+                            <Button 
+                              size="sm" 
+                              className={cn(
+                                "text-white text-xs px-3 py-1 h-8",
+                                item.status === 'Pending' ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 hover:bg-gray-500"
+                              )}
+                            >
+                              Download Report
+                            </Button>
+                          </TableCell>
+                        );
+                      }
+                      
+                      return (
+                        <TableCell key={`${item.id}-${column.key}`} className="text-sm whitespace-nowrap">
+                          {item[column.key as keyof AuditData]}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item) => (
-                <tr key={item.id}>
-                  {columns.map((column) => {
-                    if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
-                      return (
-                        <td key={`${item.id}-${column.key}`}>
-                          <Select 
-                            defaultValue={item.allocation} 
-                            onValueChange={(value) => handleAllocationChange(item.id, value)}
-                          >
-                            <SelectTrigger className="w-[150px]">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="ro_admin_1">RO Admin 1</SelectItem>
-                              <SelectItem value="ro_admin_2">RO Admin 2</SelectItem>
-                              <SelectItem value="ro_admin_3">RO Admin 3</SelectItem>
-                              <SelectItem value="desk_auditor_1">Desk Auditor 1</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </td>
-                      );
-                    }
-                    
-                    if (column.key === 'fieldReport') {
-                      return (
-                        <td key={`${item.id}-${column.key}`}>
-                          <Button className={cn(
-                            "text-white text-sm px-3 py-1",
-                            item.status === 'Pending' ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 hover:bg-gray-500"
-                          )}>
-                            Download Report
-                          </Button>
-                        </td>
-                      );
-                    }
-                    
-                    return (
-                      <td key={`${item.id}-${column.key}`}>
-                        {item[column.key as keyof AuditData]}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </TableBody>
+            </Table>
+          </div>
           
-          <div className="table-pagination mt-4">
-            <Button
-              variant="outline"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="pagination-button"
-            >
-              <ChevronLeft className="mr-2 h-4 w-4" />
-              Previous
-            </Button>
-            
-            <div className="pagination-numbers">
-              {[...Array(totalPages)].map((_, i) => (
-                <div
-                  key={i + 1}
-                  className={cn(
-                    "pagination-number",
-                    currentPage === i + 1 ? "active" : "hover:bg-gray-100"
-                  )}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </div>
-              ))}
-              
-              {totalPages > 5 && (
-                <>
-                  <div className="pagination-number">...</div>
-                  <div 
-                    className="pagination-number hover:bg-gray-100"
-                    onClick={() => handlePageChange(8)}
-                  >
-                    8
-                  </div>
-                  <div 
-                    className="pagination-number hover:bg-gray-100"
-                    onClick={() => handlePageChange(9)}
-                  >
-                    9
-                  </div>
-                  <div 
-                    className="pagination-number hover:bg-gray-100"
-                    onClick={() => handlePageChange(10)}
-                  >
-                    10
-                  </div>
-                </>
-              )}
-            </div>
-            
-            <Button
-              variant="outline"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="pagination-button"
-            >
-              Next
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
+          <div className="py-4 px-6">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
+                  />
+                </PaginationItem>
+                
+                {[...Array(totalPages)].map((_, i) => {
+                  // Only show 5 page numbers at most
+                  if (
+                    i === 0 || // First page
+                    i === totalPages - 1 || // Last page
+                    (i >= currentPage - 2 && i <= currentPage + 0) // Current page and 2 before, 0 after
+                  ) {
+                    return (
+                      <PaginationItem key={i + 1}>
+                        <PaginationLink
+                          isActive={currentPage === i + 1}
+                          onClick={() => handlePageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                  return null;
+                })}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </>
       )}

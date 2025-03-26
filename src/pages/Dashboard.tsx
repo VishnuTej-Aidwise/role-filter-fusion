@@ -75,15 +75,17 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 ml-[55px] p-8 overflow-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-8 text-center">
-          {getDashboardTitle()}
-        </h1>
-        
-        <HeaderFilters onFilter={handleFilter} onExport={handleExport} />
-        
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <AuditTable data={filteredData} loading={loading} />
+      <div className="flex-1 ml-[55px] overflow-auto">
+        <div className="p-4 md:p-6">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 text-center">
+            {getDashboardTitle()}
+          </h1>
+          
+          <HeaderFilters onFilter={handleFilter} onExport={handleExport} />
+          
+          <div className="bg-white rounded-lg shadow-sm mt-4">
+            <AuditTable data={filteredData} loading={loading} />
+          </div>
         </div>
       </div>
     </div>
