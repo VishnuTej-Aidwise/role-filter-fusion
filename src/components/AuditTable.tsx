@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -62,6 +61,42 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = data.slice(startIndex, startIndex + itemsPerPage);
   
+  const handleAllocationChange = (id: string, value: string) => {
+    console.log(`Allocation changed for ${id} to ${value}`);
+    // In a real app, you'd update this in your state or backend
+  };
+
+  const renderPaginationNumbers = () => {
+    let pages = [];
+    
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      if (startPage > 2) {
+        pages.push(-1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      
+      if (endPage < totalPages - 1) {
+        pages.push(-2);
+      }
+      
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  };
+
   const getColumnsByRole = () => {
     const commonColumns = [
       { key: 'claimNumber', title: 'Claim Number' },
@@ -97,25 +132,20 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   
   const columns = getColumnsByRole();
   
-  const handleAllocationChange = (id: string, value: string) => {
-    console.log(`Allocation changed for ${id} to ${value}`);
-    // In a real app, you'd update this in your state or backend
-  };
-
   return (
     <div className="w-full overflow-auto">
       {loading ? (
-        <div className="flex justify-center items-center h-48">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-navy"></div>
+        <div className="flex justify-center items-center h-36">
+          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-navy"></div>
         </div>
       ) : (
         <>
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="text-xs">
               <TableHeader>
                 <TableRow>
                   {columns.map((column) => (
-                    <TableHead key={column.key} className="whitespace-nowrap font-semibold text-sm">
+                    <TableHead key={column.key} className="whitespace-nowrap font-semibold text-xs py-2">
                       {column.title}
                     </TableHead>
                   ))}
@@ -123,16 +153,16 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
               </TableHeader>
               <TableBody>
                 {currentItems.map((item) => (
-                  <TableRow key={item.id}>
+                  <TableRow key={item.id} className="h-9">
                     {columns.map((column) => {
                       if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
                         return (
-                          <TableCell key={`${item.id}-${column.key}`}>
+                          <TableCell key={`${item.id}-${column.key}`} className="py-1">
                             <Select 
                               defaultValue={item.allocation} 
                               onValueChange={(value) => handleAllocationChange(item.id, value)}
                             >
-                              <SelectTrigger className="w-[140px] h-8 text-xs">
+                              <SelectTrigger className="w-[120px] h-7 text-xs">
                                 <SelectValue placeholder="Select" />
                               </SelectTrigger>
                               <SelectContent>
@@ -148,22 +178,22 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
                       
                       if (column.key === 'fieldReport') {
                         return (
-                          <TableCell key={`${item.id}-${column.key}`}>
+                          <TableCell key={`${item.id}-${column.key}`} className="py-1">
                             <Button 
                               size="sm" 
                               className={cn(
-                                "text-white text-xs px-3 py-1 h-8",
+                                "text-white text-xs px-2 py-0 h-7",
                                 item.status === 'Pending' ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 hover:bg-gray-500"
                               )}
                             >
-                              Download Report
+                              Download
                             </Button>
                           </TableCell>
                         );
                       }
                       
                       return (
-                        <TableCell key={`${item.id}-${column.key}`} className="text-sm whitespace-nowrap">
+                        <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1">
                           {item[column.key as keyof AuditData]}
                         </TableCell>
                       );
@@ -174,40 +204,40 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
             </Table>
           </div>
           
-          <div className="py-4 px-6">
+          <div className="py-2 px-4">
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={() => handlePageChange(currentPage - 1)}
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                     className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
                   />
                 </PaginationItem>
                 
-                {[...Array(totalPages)].map((_, i) => {
-                  // Only show 5 page numbers at most
-                  if (
-                    i === 0 || // First page
-                    i === totalPages - 1 || // Last page
-                    (i >= currentPage - 2 && i <= currentPage + 0) // Current page and 2 before, 0 after
-                  ) {
+                {renderPaginationNumbers().map((pageNum, index) => {
+                  if (pageNum < 0) {
                     return (
-                      <PaginationItem key={i + 1}>
-                        <PaginationLink
-                          isActive={currentPage === i + 1}
-                          onClick={() => handlePageChange(i + 1)}
-                        >
-                          {i + 1}
-                        </PaginationLink>
+                      <PaginationItem key={`ellipsis-${index}`}>
+                        <span className="px-2">...</span>
                       </PaginationItem>
                     );
                   }
-                  return null;
+                  
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        isActive={currentPage === pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
                 })}
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                     className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
                   />
                 </PaginationItem>
