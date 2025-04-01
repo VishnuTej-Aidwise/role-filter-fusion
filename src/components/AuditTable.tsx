@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { ArrowDown, ArrowUp, Search } from 'lucide-react';
+import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 import {
   Table,
   TableBody,
@@ -46,20 +50,127 @@ interface AuditTableProps {
   loading?: boolean;
 }
 
+type SortDirectionType = 'asc' | 'desc' | null;
+
 const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [sortColumn, setSortColumn] = useState<string>('claimNumber');
+  const [sortDirection, setSortDirection] = useState<SortDirectionType>('asc');
   const { user } = useAuth();
   const role = user?.role as UserRole;
   
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  
+  // Get all possible columns based on role
+  const allColumns = useMemo(() => {
+    const commonColumns = [
+      { key: 'claimNumber', title: 'Claim Number' },
+      { key: 'claimDate', title: 'Claim Date' },
+      { key: 'hospitalName', title: 'Hospital Name' },
+      { key: 'hospitalLocation', title: 'Hospital Location' },
+      { key: 'htpaLocation', title: 'HTPA Location' },
+      { key: 'dateOfAdmission', title: 'Date of Admission' },
+      { key: 'dateOfDischarge', title: 'Date of Discharge' },
+      { key: 'fraudTriggers', title: 'Fraud Triggers' },
+      { key: 'fieldInvestigationDate', title: 'Field Investigation Date' },
+      { key: 'claimStatus', title: 'Claim Status' },
+      { key: 'status', title: 'Status' },
+      { key: 'deskAuditReferralDate', title: 'Desk Audit Referral Date' },
+      { key: 'taTCompliance', title: 'TA T Compliance' },
+      { key: 'claimIntimationAging', title: 'Claim Intimation Aging' },
+      { key: 'aiManualTrigger', title: 'AI/Manual Trigger' }
+    ];
+    
+    if (role === 'ro_admin' || role === 'ho_admin') {
+      return [
+        ...commonColumns,
+        { key: 'allocation', title: 'Allocation' },
+        { key: 'fieldReport', title: 'Field Report' }
+      ];
+    }
+    
+    return [
+      ...commonColumns,
+      { key: 'fieldReport', title: 'Field Report' }
+    ];
+  }, [role]);
+
+  // Default visible columns - show a subset initially to reduce horizontal scrolling
+  const defaultVisibleColumns = useMemo(() => {
+    const initialVisible = {
+      claimNumber: true,
+      claimDate: true,
+      hospitalName: true,
+      status: true,
+      fieldReport: true
+    };
+    
+    if (role === 'ro_admin' || role === 'ho_admin') {
+      initialVisible['allocation'] = true;
+    }
+    
+    return Object.fromEntries(allColumns.map(col => [col.key, initialVisible[col.key as keyof typeof initialVisible] || false]));
+  }, [allColumns, role]);
+  
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(defaultVisibleColumns);
+  
+  // Reset table state when data changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data]);
+  
+  // Apply search filter to data
+  const filteredData = useMemo(() => {
+    if (!search.trim()) return data;
+    
+    const searchTerm = search.toLowerCase();
+    return data.filter(item => 
+      item.claimNumber.toLowerCase().includes(searchTerm) ||
+      item.hospitalName.toLowerCase().includes(searchTerm) ||
+      item.status.toLowerCase().includes(searchTerm)
+    );
+  }, [data, search]);
+  
+  // Apply sorting to filtered data
+  const sortedData = useMemo(() => {
+    if (!sortColumn || !sortDirection) return filteredData;
+    
+    return [...filteredData].sort((a, b) => {
+      if (!a[sortColumn as keyof AuditData] || !b[sortColumn as keyof AuditData]) return 0;
+      
+      const valueA = a[sortColumn as keyof AuditData].toString().toLowerCase();
+      const valueB = b[sortColumn as keyof AuditData].toString().toLowerCase();
+      
+      if (sortDirection === 'asc') {
+        return valueA.localeCompare(valueB);
+      } else {
+        return valueB.localeCompare(valueA);
+      }
+    });
+  }, [filteredData, sortColumn, sortDirection]);
+  
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = sortedData.slice(startIndex, startIndex + itemsPerPage);
+  
+  const handleSortChange = (column: string) => {
+    if (sortColumn === column) {
+      // Cycle through: asc -> desc -> null -> asc
+      setSortDirection(prev => {
+        if (prev === 'asc') return 'desc';
+        if (prev === 'desc') return null;
+        return 'asc';
+      });
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
   
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-  
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = data.slice(startIndex, startIndex + itemsPerPage);
   
   const handleAllocationChange = (id: string, value: string) => {
     console.log(`Allocation changed for ${id} to ${value}`);
@@ -97,153 +208,185 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
     return pages;
   };
 
-  const getColumnsByRole = () => {
-    const commonColumns = [
-      { key: 'claimNumber', title: 'Claim Number' },
-      { key: 'claimDate', title: 'Claim Date' },
-      { key: 'hospitalName', title: 'Hospital Name' },
-      { key: 'hospitalLocation', title: 'Hospital Location' },
-      { key: 'htpaLocation', title: 'HTPA Location' },
-      { key: 'dateOfAdmission', title: 'Date of Admission' },
-      { key: 'dateOfDischarge', title: 'Date of Discharge' },
-      { key: 'fraudTriggers', title: 'Fraud Triggers' },
-      { key: 'fieldInvestigationDate', title: 'Field Investigation Date' },
-      { key: 'claimStatus', title: 'Claim Status' },
-      { key: 'status', title: 'Status' },
-      { key: 'deskAuditReferralDate', title: 'Desk Audit Referral Date' },
-      { key: 'taTCompliance', title: 'TA T Compliance (Days/Hours)' },
-      { key: 'claimIntimationAging', title: 'Claim Intimation Aging (Days/Hours)' },
-      { key: 'aiManualTrigger', title: 'AI/ Manual Trigger' }
-    ];
+  // Get only the visible columns to display
+  const displayColumns = allColumns.filter(col => visibleColumns[col.key]);
+  
+  // Render sort indicator
+  const renderSortIndicator = (column: string) => {
+    if (sortColumn !== column) return null;
     
-    if (role === 'ro_admin' || role === 'ho_admin') {
-      return [
-        ...commonColumns,
-        { key: 'allocation', title: 'Allocation' },
-        { key: 'fieldReport', title: 'Field Report' }
-      ];
+    if (sortDirection === 'asc') {
+      return <ArrowUp size={14} className="ml-1 inline" />;
+    } else if (sortDirection === 'desc') {
+      return <ArrowDown size={14} className="ml-1 inline" />;
     }
     
-    return [
-      ...commonColumns,
-      { key: 'fieldReport', title: 'Field Report' }
-    ];
+    return null;
   };
   
-  const columns = getColumnsByRole();
-  
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full">
       {loading ? (
-        <div className="flex justify-center items-center h-36">
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-navy"></div>
+        <div className="flex justify-center items-center h-28">
+          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-navy"></div>
         </div>
       ) : (
         <>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 pb-3 gap-2">
+            <div className="relative w-full sm:w-[240px]">
+              <Search size={15} className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500" />
+              <Input
+                type="text"
+                placeholder="Search claims..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8 h-8 text-xs w-full"
+              />
+            </div>
+            <ColumnVisibilityDropdown 
+              columns={allColumns}
+              visibleColumns={visibleColumns}
+              setVisibleColumns={setVisibleColumns}
+            />
+          </div>
+          
           <div className="overflow-x-auto">
-            <Table className="text-xs">
+            <Table className="text-xs border-collapse table-auto w-full">
               <TableHeader>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableHead key={column.key} className="whitespace-nowrap font-semibold text-xs py-2">
-                      {column.title}
+                <TableRow className="bg-gray-50">
+                  {displayColumns.map((column) => (
+                    <TableHead 
+                      key={column.key} 
+                      className="whitespace-nowrap font-semibold text-xs py-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleSortChange(column.key)}
+                    >
+                      <div className="flex items-center">
+                        {column.title}
+                        {renderSortIndicator(column.key)}
+                      </div>
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentItems.map((item) => (
-                  <TableRow key={item.id} className="h-9">
-                    {columns.map((column) => {
-                      if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
+                {currentItems.length > 0 ? (
+                  currentItems.map((item) => (
+                    <TableRow key={item.id} className="h-8 hover:bg-gray-50">
+                      {displayColumns.map((column) => {
+                        if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
+                          return (
+                            <TableCell key={`${item.id}-${column.key}`} className="py-1">
+                              <Select 
+                                defaultValue={item.allocation} 
+                                onValueChange={(value) => handleAllocationChange(item.id, value)}
+                              >
+                                <SelectTrigger className="w-[120px] h-6 text-xs">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="ro_admin_1">RO Admin 1</SelectItem>
+                                  <SelectItem value="ro_admin_2">RO Admin 2</SelectItem>
+                                  <SelectItem value="ro_admin_3">RO Admin 3</SelectItem>
+                                  <SelectItem value="desk_auditor_1">Desk Auditor 1</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </TableCell>
+                          );
+                        }
+                        
+                        if (column.key === 'fieldReport') {
+                          return (
+                            <TableCell key={`${item.id}-${column.key}`} className="py-1">
+                              <Button 
+                                size="sm" 
+                                className={cn(
+                                  "text-white text-xs px-2 py-0 h-6",
+                                  item.status === 'Pending' ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 hover:bg-gray-500"
+                                )}
+                              >
+                                Download
+                              </Button>
+                            </TableCell>
+                          );
+                        }
+                        
+                        if (column.key === 'status') {
+                          return (
+                            <TableCell key={`${item.id}-${column.key}`} className="py-1">
+                              <span className={cn(
+                                "px-2 py-0.5 rounded-full text-xs font-medium",
+                                item.status === 'Completed' ? "bg-green-100 text-green-800" : 
+                                item.status === 'Pending' ? "bg-blue-100 text-blue-800" : 
+                                "bg-gray-100 text-gray-800"
+                              )}>
+                                {item.status}
+                              </span>
+                            </TableCell>
+                          );
+                        }
+                        
                         return (
-                          <TableCell key={`${item.id}-${column.key}`} className="py-1">
-                            <Select 
-                              defaultValue={item.allocation} 
-                              onValueChange={(value) => handleAllocationChange(item.id, value)}
-                            >
-                              <SelectTrigger className="w-[120px] h-7 text-xs">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="ro_admin_1">RO Admin 1</SelectItem>
-                                <SelectItem value="ro_admin_2">RO Admin 2</SelectItem>
-                                <SelectItem value="ro_admin_3">RO Admin 3</SelectItem>
-                                <SelectItem value="desk_auditor_1">Desk Auditor 1</SelectItem>
-                              </SelectContent>
-                            </Select>
+                          <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1">
+                            {item[column.key as keyof AuditData]}
                           </TableCell>
                         );
-                      }
-                      
-                      if (column.key === 'fieldReport') {
-                        return (
-                          <TableCell key={`${item.id}-${column.key}`} className="py-1">
-                            <Button 
-                              size="sm" 
-                              className={cn(
-                                "text-white text-xs px-2 py-0 h-7",
-                                item.status === 'Pending' ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 hover:bg-gray-500"
-                              )}
-                            >
-                              Download
-                            </Button>
-                          </TableCell>
-                        );
-                      }
-                      
-                      return (
-                        <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1">
-                          {item[column.key as keyof AuditData]}
-                        </TableCell>
-                      );
-                    })}
+                      })}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={displayColumns.length} className="h-32 text-center">
+                      No results found
+                    </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>
           
-          <div className="py-2 px-4">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
-                  />
-                </PaginationItem>
-                
-                {renderPaginationNumbers().map((pageNum, index) => {
-                  if (pageNum < 0) {
+          {totalPages > 0 && (
+            <div className="py-2 px-2">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      className={cn(currentPage === 1 && "pointer-events-none opacity-50", "text-xs h-7")}
+                    />
+                  </PaginationItem>
+                  
+                  {renderPaginationNumbers().map((pageNum, index) => {
+                    if (pageNum < 0) {
+                      return (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <span className="px-1 text-xs">...</span>
+                        </PaginationItem>
+                      );
+                    }
+                    
                     return (
-                      <PaginationItem key={`ellipsis-${index}`}>
-                        <span className="px-2">...</span>
+                      <PaginationItem key={pageNum}>
+                        <PaginationLink
+                          isActive={currentPage === pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className="text-xs h-7 w-7"
+                        >
+                          {pageNum}
+                        </PaginationLink>
                       </PaginationItem>
                     );
-                  }
+                  })}
                   
-                  return (
-                    <PaginationItem key={pageNum}>
-                      <PaginationLink
-                        isActive={currentPage === pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                      >
-                        {pageNum}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                })}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                    className={cn(currentPage === totalPages && "pointer-events-none opacity-50")}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      className={cn(currentPage === totalPages && "pointer-events-none opacity-50", "text-xs h-7")}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </>
       )}
     </div>
