@@ -19,6 +19,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'inter': ['Inter', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -67,6 +70,16 @@ export default {
 					DEFAULT: '#003366',
 					dark: '#002244',
 					light: '#004488'
+				},
+				status: {
+					completed: '#dcfce7',
+					'completed-text': '#15803d',
+					pending: '#dbeafe',
+					'pending-text': '#1e40af',
+					'desk-audit': '#fef3c7',
+					'desk-audit-text': '#92400e',
+					'claim-processing': '#f3e8ff',
+					'claim-processing-text': '#6b21a8',
 				}
 			},
 			borderRadius: {

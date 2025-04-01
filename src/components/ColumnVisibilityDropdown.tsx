@@ -49,30 +49,30 @@ const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 text-xs flex items-center gap-1">
+        <Button variant="outline" size="sm" className="h-8 text-xs flex items-center gap-1 bg-gray-50 border-gray-200">
           <Eye size={14} />
           Columns
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[180px]">
-        <DropdownMenuLabel className="text-xs">Toggle Columns</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+      <DropdownMenuContent align="end" className="w-[180px] bg-white border border-gray-200 rounded-md shadow-md">
+        <DropdownMenuLabel className="text-xs font-semibold text-gray-700">Toggle Columns</DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-gray-200" />
         <div className="flex justify-between px-2 py-1">
-          <Button variant="ghost" size="sm" onClick={handleSelectAll} className="h-6 text-xs">
+          <Button variant="ghost" size="sm" onClick={handleSelectAll} className="h-6 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50">
             Show All
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleDeselectAll} className="h-6 text-xs">
+          <Button variant="ghost" size="sm" onClick={handleDeselectAll} className="h-6 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50">
             Hide All
           </Button>
         </div>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="bg-gray-200" />
         <div className="max-h-[300px] overflow-y-auto">
           {columns.map((column) => (
             <DropdownMenuCheckboxItem
               key={column.key}
               checked={visibleColumns[column.key]}
               onCheckedChange={() => handleColumnToggle(column.key)}
-              className="capitalize text-xs"
+              className="capitalize text-xs hover:bg-gray-50"
             >
               {column.title}
             </DropdownMenuCheckboxItem>

@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { ArrowDown, ArrowUp, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, Search, Download } from 'lucide-react';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 import {
   Table,
@@ -214,22 +214,38 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   // Render sort indicator
   const renderSortIndicator = (column: string) => {
     if (sortColumn !== column) {
-      return <div className="opacity-30 ml-1 inline-flex flex-col">
-        <ArrowUp size={8} className="mb-[-3px]" />
-        <ArrowDown size={8} className="mt-[-3px]" />
+      return <div className="opacity-40 ml-1 inline-flex flex-col">
+        <ArrowUp size={10} className="mb-[-3px]" />
+        <ArrowDown size={10} className="mt-[-3px]" />
       </div>;
     }
     
     if (sortDirection === 'asc') {
-      return <ArrowUp size={14} className="ml-1 inline text-blue-500" />;
+      return <ArrowUp size={14} className="ml-1 inline text-blue-600" />;
     } else if (sortDirection === 'desc') {
-      return <ArrowDown size={14} className="ml-1 inline text-blue-500" />;
+      return <ArrowDown size={14} className="ml-1 inline text-blue-600" />;
     }
     
-    return <div className="opacity-30 ml-1 inline-flex flex-col">
-      <ArrowUp size={8} className="mb-[-3px]" />
-      <ArrowDown size={8} className="mt-[-3px]" />
+    return <div className="opacity-50 ml-1 inline-flex flex-col">
+      <ArrowUp size={10} className="mb-[-3px]" />
+      <ArrowDown size={10} className="mt-[-3px]" />
     </div>;
+  };
+
+  // Get status badge class
+  const getStatusBadgeClass = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return "bg-status-completed text-status-completed-text";
+      case 'pending':
+        return "bg-status-pending text-status-pending-text";
+      case 'desk audit':
+        return "bg-status-desk-audit text-status-desk-audit-text";
+      case 'claim processing':
+        return "bg-status-claim-processing text-status-claim-processing-text";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
   
   return (
@@ -259,7 +275,7 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
           </div>
           
           <div className="overflow-x-auto">
-            <Table className="text-xs border-collapse table-auto w-full">
+            <Table className="text-xs border-collapse table-auto w-full font-inter">
               <TableHeader>
                 <TableRow className="bg-gray-50">
                   {displayColumns.map((column) => (
@@ -308,10 +324,11 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
                               <Button 
                                 size="sm" 
                                 className={cn(
-                                  "text-white text-xs px-2 py-0 h-6",
-                                  item.status === 'Pending' ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 hover:bg-gray-500"
+                                  "text-white text-xs px-2 py-0 h-6 gap-1",
+                                  item.status === 'Pending' ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 hover:bg-gray-500"
                                 )}
                               >
+                                <Download size={12} />
                                 Download
                               </Button>
                             </TableCell>
@@ -323,9 +340,7 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
                             <TableCell key={`${item.id}-${column.key}`} className="py-1">
                               <span className={cn(
                                 "px-2 py-0.5 rounded-full text-xs font-medium",
-                                item.status === 'Completed' ? "bg-green-100 text-green-800" : 
-                                item.status === 'Pending' ? "bg-blue-100 text-blue-800" : 
-                                "bg-gray-100 text-gray-800"
+                                getStatusBadgeClass(item.status)
                               )}>
                                 {item.status}
                               </span>

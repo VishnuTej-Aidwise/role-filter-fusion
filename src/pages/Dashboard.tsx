@@ -18,6 +18,7 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState(mockAuditData);
   const [filteredData, setFilteredData] = useState(mockAuditData);
   const [loading, setLoading] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
   useEffect(() => {
     // Simulate data loading
@@ -27,6 +28,22 @@ const Dashboard: React.FC = () => {
       setFilteredData(mockAuditData);
       setLoading(false);
     }, 500);
+    
+    // Listen for sidebar expansion/collapse
+    const handleSidebarChange = () => {
+      const sidebar = document.querySelector('[class*="w-64"]');
+      setSidebarExpanded(!!sidebar);
+    };
+    
+    // Create a MutationObserver to detect class changes on the sidebar
+    const observer = new MutationObserver(handleSidebarChange);
+    const sidebarElement = document.querySelector('div[class*="flex flex-col h-screen fixed"]');
+    
+    if (sidebarElement) {
+      observer.observe(sidebarElement, { attributes: true, attributeFilter: ['class'] });
+    }
+    
+    return () => observer.disconnect();
   }, []);
 
   if (!isAuthenticated) {
@@ -75,7 +92,7 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className="flex-1 overflow-hidden transition-all duration-300 ml-[50px] md:ml-64">
+      <div className={`flex-1 overflow-hidden transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
         <div className="p-3 md:p-4 h-full flex flex-col">
           <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <h1 className="text-xl font-bold text-gray-800 mb-4">
