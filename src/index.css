@@ -124,12 +124,16 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  hyphens: auto;
+  word-break: break-word;
+  max-width: 120px;
 }
 
 .audit-table td {
   padding: 8px 14px;
   border-bottom: 1px solid #e5e7eb;
   font-size: 0.75rem;
+  text-align: center;
 }
 
 .audit-table tr:hover td {
@@ -252,6 +256,8 @@
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  width: 100%;
+  display: inline-block;
 }
 
 .status-pending {
@@ -260,22 +266,38 @@
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  width: 100%;
+  display: inline-block;
 }
 
 .status-desk-audit {
-  background-color: #fff7ed;
-  color: #c2410c;
+  background-color: #fef3c7;
+  color: #92400e;
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  width: 100%;
+  display: inline-block;
 }
 
 .status-claim-processing {
-  background-color: #faf5ff;
-  color: #6b21a8;
+  background-color: #e9d5ff;
+  color: #7e22ce;
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  width: 100%;
+  display: inline-block;
+}
+
+.status-investigation {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-weight: 500;
+  width: 100%;
+  display: inline-block;
 }
 
 /* Sort indicators */
@@ -312,6 +334,9 @@
 /* Table header styles */
 .table-header {
   @apply bg-gray-100 text-gray-700 font-semibold text-xs uppercase tracking-wide px-4 py-2 border-b border-gray-200;
+  hyphens: auto;
+  word-break: break-word;
+  max-width: 120px;
 }
 
 .table-header-sortable {
@@ -324,4 +349,12 @@
 
 .table-download-btn {
   @apply bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded flex items-center gap-1.5 transition-colors;
+}
+
+/* Long header column text handler */
+.header-text-wrap {
+  hyphens: auto;
+  max-width: 120px;
+  word-break: break-word;
+  white-space: normal;
 }
