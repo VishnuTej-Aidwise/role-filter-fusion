@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -205,83 +204,35 @@ const AuditTable: React.FC<AuditTableProps> = ({
 
   const renderSortIndicator = (column: string) => {
     if (sortColumn !== column) {
-      return <div className="opacity-70 ml-1 inline-flex flex-col">
-        <ArrowUp size={8} className="mb-[-2px]" />
-        <ArrowDown size={8} className="mt-[-2px]" />
+      return <div className="opacity-50 ml-1.5 inline-flex flex-col">
+        <ArrowUp size={10} className="mb-[-3px]" />
+        <ArrowDown size={10} className="mt-[-3px]" />
       </div>;
     }
     if (sortDirection === 'asc') {
-      return <ArrowUp size={12} className="ml-1 inline text-blue-600" />;
+      return <ArrowUp size={14} className="ml-1.5 inline text-blue-600" />;
     } else if (sortDirection === 'desc') {
-      return <ArrowDown size={12} className="ml-1 inline text-blue-600" />;
+      return <ArrowDown size={14} className="ml-1.5 inline text-blue-600" />;
     }
-    return <div className="opacity-70 ml-1 inline-flex flex-col">
-      <ArrowUp size={8} className="mb-[-2px]" />
-      <ArrowDown size={8} className="mt-[-2px]" />
+    return <div className="opacity-50 ml-1.5 inline-flex flex-col">
+      <ArrowUp size={10} className="mb-[-3px]" />
+      <ArrowDown size={10} className="mt-[-3px]" />
     </div>;
   };
 
   const getStatusBadgeClass = (status: string) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower === 'completed') {
-      return "status-completed";
-    } else if (statusLower === 'pending') {
-      return "status-pending";
-    } else if (statusLower === 'desk audit') {
-      return "status-desk-audit";
-    } else if (statusLower === 'claim processing') {
-      return "status-claim-processing";
-    } else if (statusLower === 'investigation') {
-      return "status-investigation";
-    } else {
-      return "bg-gray-100 text-gray-800 px-2.5 py-0.5 rounded-full text-xs font-medium";
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return "bg-status-completed text-status-completed-text";
+      case 'pending':
+        return "bg-status-pending text-status-pending-text";
+      case 'desk audit':
+        return "bg-status-desk-audit text-status-desk-audit-text";
+      case 'claim processing':
+        return "bg-status-claim-processing text-status-claim-processing-text";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
-  };
-
-  // Function to format column headers with line breaks as needed
-  const formatColumnTitle = (title: string) => {
-    // Handle specific long titles with custom hyphenation
-    if (title === 'Field Investigation Date') {
-      return (
-        <span className="header-text-wrap">
-          Field<br/>Investigation<br/>Date
-        </span>
-      );
-    } else if (title === 'Desk Audit Referral Date') {
-      return (
-        <span className="header-text-wrap">
-          Desk Audit<br/>Referral Date
-        </span>
-      );
-    } else if (title === 'Claim Intimation Aging') {
-      return (
-        <span className="header-text-wrap">
-          Claim<br/>Intimation<br/>Aging
-        </span>
-      );
-    } else if (title === 'AI/Manual Trigger') {
-      return (
-        <span className="header-text-wrap">
-          AI/Manual<br/>Trigger
-        </span>
-      );
-    } else if (title.length > 12) {
-      // Add breaks for other long titles
-      const words = title.split(' ');
-      if (words.length > 1) {
-        return (
-          <span className="header-text-wrap">
-            {words.map((word, index) => (
-              <React.Fragment key={index}>
-                {word}
-                {index < words.length - 1 && <br />}
-              </React.Fragment>
-            ))}
-          </span>
-        );
-      }
-    }
-    return <span className="header-text-wrap">{title}</span>;
   };
 
   return <div className="w-full">
@@ -305,12 +256,12 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     key={column.key} 
                     onClick={() => handleSortChange(column.key)} 
                     className={cn(
-                      "whitespace-normal text-xs py-2.5 cursor-pointer min-w-[80px] max-w-[120px]", 
+                      "whitespace-nowrap text-xs py-2.5 cursor-pointer", 
                       sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
                     )}
                   >
-                    <div className="flex items-center justify-between h-full">
-                      {formatColumnTitle(column.title)}
+                    <div className="flex items-center">
+                      {column.title}
                       {renderSortIndicator(column.key)}
                     </div>
                   </TableHead>
@@ -339,7 +290,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     if (column.key === 'fieldReport') {
                       return <TableCell key={`${item.id}-${column.key}`} className="py-1">
                         <Button size="sm" className={cn(
-                          "text-white text-xs px-2.5 py-0.5 h-6 gap-1.5 mx-auto", 
+                          "text-white text-xs px-2.5 py-0.5 h-6 gap-1.5", 
                           item.status === 'Pending' 
                             ? "bg-blue-600 hover:bg-blue-700" 
                             : "bg-gray-400 hover:bg-gray-500"
@@ -351,7 +302,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     }
                     if (column.key === 'status') {
                       return <TableCell key={`${item.id}-${column.key}`} className="py-1">
-                        <span className={cn(getStatusBadgeClass(item.status))}>
+                        <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium", getStatusBadgeClass(item.status))}>
                           {item.status}
                         </span>
                       </TableCell>;
