@@ -39,15 +39,15 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
 
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center gap-3">
+      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-2">
+        <div className="flex flex-col md:flex-row md:items-end gap-4 flex-1">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Hospital Name:</label>
+            <label className="text-xs font-medium text-gray-700">Hospital Name:</label>
             <Select value={hospital} onValueChange={(value) => {
               setHospital(value);
               handleBasicFilterChange();
             }}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full md:w-[180px] h-8 text-xs">
                 <SelectValue placeholder="Select Hospital" />
               </SelectTrigger>
               <SelectContent>
@@ -59,7 +59,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Date Range:</label>
+            <label className="text-xs font-medium text-gray-700">Date Range:</label>
             <div className="flex items-center gap-2">
               <Input
                 type="date"
@@ -69,9 +69,9 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
                   setDateFrom(e.target.value);
                   handleBasicFilterChange();
                 }}
-                className="w-[150px]"
+                className="w-full md:w-[140px] h-8 text-xs"
               />
-              <span className="text-gray-500">to</span>
+              <span className="text-gray-500 text-xs">to</span>
               <Input
                 type="date"
                 placeholder="To"
@@ -80,26 +80,28 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
                   setDateTo(e.target.value);
                   handleBasicFilterChange();
                 }}
-                className="w-[150px]"
+                className="w-full md:w-[140px] h-8 text-xs"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end ml-auto">
           <Button 
             variant="outline" 
+            size="sm"
             onClick={() => setIsFilterPanelOpen(true)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 h-8 text-xs"
           >
-            <Filter size={16} />
+            <Filter size={14} />
             More Filters
           </Button>
           <Button 
+            size="sm"
             onClick={onExport}
-            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600"
+            className="flex items-center gap-1 h-8 text-xs bg-blue-500 hover:bg-blue-600"
           >
-            <Download size={16} />
+            <Download size={14} />
             Download Excel
           </Button>
         </div>

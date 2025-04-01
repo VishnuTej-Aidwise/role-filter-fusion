@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -48,13 +49,13 @@ const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="ml-2 h-7">
-          <Eye size={16} className="mr-1" />
+        <Button variant="outline" size="sm" className="h-8 text-xs flex items-center gap-1">
+          <Eye size={14} />
           Columns
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[180px]">
-        <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs">Toggle Columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="flex justify-between px-2 py-1">
           <Button variant="ghost" size="sm" onClick={handleSelectAll} className="h-6 text-xs">
@@ -71,7 +72,7 @@ const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({
               key={column.key}
               checked={visibleColumns[column.key]}
               onCheckedChange={() => handleColumnToggle(column.key)}
-              className="capitalize"
+              className="capitalize text-xs"
             >
               {column.title}
             </DropdownMenuCheckboxItem>

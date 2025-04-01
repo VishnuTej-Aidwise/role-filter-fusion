@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, FileText, Clock, Users, Settings, LogOut } from 'lucide-react';
+import { ChevronRight, FileText, Clock, Users, Settings, LogOut, ChevronLeft } from 'lucide-react';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface SidebarItemProps {
@@ -16,30 +17,25 @@ interface SidebarItemProps {
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ icon, href, isActive, label }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link
-            to={href}
-            className={cn(
-              "w-full h-12 flex items-center justify-center text-white transition-all duration-200",
-              isActive ? "bg-navy-light" : "hover:bg-navy-light"
-            )}
-          >
-            {icon}
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          {label}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Link
+      to={href}
+      className={cn(
+        "w-full h-12 flex items-center px-4 text-white transition-all duration-200",
+        isActive ? "bg-blue-700" : "hover:bg-blue-700"
+      )}
+    >
+      <div className="flex items-center gap-3">
+        {icon}
+        <span className="text-sm font-medium">{label}</span>
+      </div>
+    </Link>
   );
 };
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [expanded, setExpanded] = useState(true);
   
   const role = user?.role || 'desk_auditor';
   
@@ -53,47 +49,157 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen fixed left-0 top-0 z-10">
-      <div className="w-[50px] bg-navy flex flex-col items-center py-2">
-        <div className="h-8 w-8 bg-navy-light rounded-sm flex items-center justify-center text-white mb-6">
-          <ChevronRight size={20} />
-        </div>
-        
-        <div className="flex flex-col items-center space-y-1 flex-1">
-          <SidebarItem 
-            icon={<FileText size={20} />} 
-            href={`/dashboard/${role}`} 
-            isActive={isActive('dashboard')} 
-            label="Dashboard"
-          />
-          <SidebarItem 
-            icon={<Clock size={20} />} 
-            href={`/history/${role}`} 
-            isActive={isActive('history')} 
-            label="History"
-          />
-          <SidebarItem 
-            icon={<Users size={20} />} 
-            href={`/users/${role}`} 
-            isActive={isActive('users')} 
-            label="Users"
-          />
-          <SidebarItem 
-            icon={<Settings size={20} />} 
-            href={`/settings/${role}`} 
-            isActive={isActive('settings')} 
-            label="Settings"
-          />
-        </div>
-        
-        <div className="mt-auto mb-4">
+    <div 
+      className={cn(
+        "flex flex-col h-screen fixed left-0 top-0 z-10 bg-blue-600 transition-all duration-300",
+        expanded ? "w-64" : "w-[50px]"
+      )}
+    >
+      <div className="flex items-center h-16 px-4 border-b border-blue-700">
+        {expanded ? (
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
+                H
+              </div>
+              <span className="text-white font-bold text-lg">HITPA</span>
+            </div>
+            <button 
+              onClick={() => setExpanded(false)}
+              className="text-white hover:bg-blue-700 p-1 rounded-full"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          </div>
+        ) : (
           <button 
-            onClick={handleLogout} 
-            className="w-full h-12 flex items-center justify-center text-white hover:bg-navy-light transition-all duration-200"
+            onClick={() => setExpanded(true)}
+            className="text-white w-full flex justify-center hover:bg-blue-700"
           >
-            <LogOut size={20} />
+            <ChevronRight size={20} />
           </button>
-        </div>
+        )}
+      </div>
+      
+      <div className="flex flex-col flex-1 overflow-y-auto">
+        {expanded ? (
+          <>
+            <SidebarItem 
+              icon={<FileText size={18} />} 
+              href={`/dashboard/${role}`} 
+              isActive={isActive('dashboard')} 
+              label="Dashboard"
+            />
+            <SidebarItem 
+              icon={<Clock size={18} />} 
+              href={`/history/${role}`} 
+              isActive={isActive('history')} 
+              label="History"
+            />
+            <SidebarItem 
+              icon={<Users size={18} />} 
+              href={`/users/${role}`} 
+              isActive={isActive('users')} 
+              label="Users"
+            />
+            <SidebarItem 
+              icon={<Settings size={18} />} 
+              href={`/settings/${role}`} 
+              isActive={isActive('settings')} 
+              label="Settings"
+            />
+          </>
+        ) : (
+          <TooltipProvider>
+            <div className="flex flex-col items-center py-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={`/dashboard/${role}`}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
+                      isActive('dashboard') ? "bg-blue-700" : "hover:bg-blue-700"
+                    )}
+                  >
+                    <FileText size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">Dashboard</TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={`/history/${role}`}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
+                      isActive('history') ? "bg-blue-700" : "hover:bg-blue-700"
+                    )}
+                  >
+                    <Clock size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">History</TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={`/users/${role}`}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
+                      isActive('users') ? "bg-blue-700" : "hover:bg-blue-700"
+                    )}
+                  >
+                    <Users size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">Users</TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={`/settings/${role}`}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
+                      isActive('settings') ? "bg-blue-700" : "hover:bg-blue-700"
+                    )}
+                  >
+                    <Settings size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">Settings</TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
+        )}
+      </div>
+      
+      <div className="mt-auto border-t border-blue-700">
+        {expanded ? (
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-4 h-12 text-white hover:bg-blue-700 transition-colors"
+          >
+            <LogOut size={18} />
+            <span className="text-sm font-medium">Logout</span>
+          </button>
+        ) : (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center justify-center w-full h-12 text-white hover:bg-blue-700 transition-colors"
+                >
+                  <LogOut size={20} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Logout</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
     </div>
   );

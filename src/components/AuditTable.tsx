@@ -213,26 +213,34 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
   
   // Render sort indicator
   const renderSortIndicator = (column: string) => {
-    if (sortColumn !== column) return null;
-    
-    if (sortDirection === 'asc') {
-      return <ArrowUp size={14} className="ml-1 inline" />;
-    } else if (sortDirection === 'desc') {
-      return <ArrowDown size={14} className="ml-1 inline" />;
+    if (sortColumn !== column) {
+      return <div className="opacity-30 ml-1 inline-flex flex-col">
+        <ArrowUp size={8} className="mb-[-3px]" />
+        <ArrowDown size={8} className="mt-[-3px]" />
+      </div>;
     }
     
-    return null;
+    if (sortDirection === 'asc') {
+      return <ArrowUp size={14} className="ml-1 inline text-blue-500" />;
+    } else if (sortDirection === 'desc') {
+      return <ArrowDown size={14} className="ml-1 inline text-blue-500" />;
+    }
+    
+    return <div className="opacity-30 ml-1 inline-flex flex-col">
+      <ArrowUp size={8} className="mb-[-3px]" />
+      <ArrowDown size={8} className="mt-[-3px]" />
+    </div>;
   };
   
   return (
     <div className="w-full">
       {loading ? (
         <div className="flex justify-center items-center h-28">
-          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-navy"></div>
+          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-600"></div>
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 pb-3 gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 pb-3 gap-2 border-b">
             <div className="relative w-full sm:w-[240px]">
               <Search size={15} className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <Input
@@ -325,6 +333,14 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
                           );
                         }
                         
+                        if (column.key === 'claimNumber') {
+                          return (
+                            <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium">
+                              {item[column.key as keyof AuditData]}
+                            </TableCell>
+                          );
+                        }
+                        
                         return (
                           <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1">
                             {item[column.key as keyof AuditData]}
@@ -345,7 +361,10 @@ const AuditTable: React.FC<AuditTableProps> = ({ data, loading = false }) => {
           </div>
           
           {totalPages > 0 && (
-            <div className="py-2 px-2">
+            <div className="py-2 px-2 flex justify-between items-center border-t">
+              <div className="text-xs text-gray-500">
+                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, sortedData.length)} of {sortedData.length} entries
+              </div>
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
