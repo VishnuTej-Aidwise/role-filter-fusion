@@ -8,6 +8,7 @@ import { ArrowDown, ArrowUp, Search, Download } from 'lucide-react';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AuditData {
   id: string;
@@ -118,6 +119,10 @@ const AuditTable: React.FC<AuditTableProps> = ({
       claimNumber: true,
       claimDate: true,
       hospitalName: true,
+      hospitalLocation: true,
+      htpaLocation: true,
+      dateOfAdmission: true,
+      dateOfDischarge: true,
       status: true,
       fieldReport: true
     };
@@ -263,98 +268,102 @@ const AuditTable: React.FC<AuditTableProps> = ({
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 pb-2 gap-2 border-b">
-            <div className="relative w-full sm:w-[240px]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-1 pb-1 gap-1 border-b">
+            <div className="relative w-full sm:w-[200px]">
               <Search size={15} className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500" />
-              <Input type="text" placeholder="Search claims..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-8 text-xs w-full" />
+              <Input type="text" placeholder="Search claims..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-7 text-xs w-full" />
             </div>
             <ColumnVisibilityDropdown columns={allColumns} visibleColumns={visibleColumns} setVisibleColumns={setVisibleColumns} />
           </div>
           
           <div className="overflow-x-auto flex-grow">
-            <Table className="text-xs border-collapse table-auto w-full font-poppins">
-              <TableHeader>
-                <TableRow className="h-10">
-                  {displayColumns.map(column => (
-                    <TableHead 
-                      key={column.key} 
-                      onClick={() => handleSortChange(column.key)} 
-                      className={cn(
-                        "whitespace-pre-wrap text-xs py-3 cursor-pointer min-w-[100px] max-w-[150px] text-center", 
-                        sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
-                      )}
-                    >
-                      <div className="flex items-center justify-center">
-                        {column.title.length > 12 
-                          ? column.title.replace(/\s+/g, '\n')
-                          : column.title}
-                        {renderSortIndicator(column.key)}
-                      </div>
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentItems.length > 0 ? currentItems.map(item => (
-                  <TableRow key={item.id} className="h-12 hover:bg-gray-50">
-                    {displayColumns.map(column => {
-                      if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
-                        return <TableCell key={`${item.id}-${column.key}`} className="py-2 text-center">
-                          <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
-                            <SelectTrigger className="w-[130px] h-8 text-xs mx-auto">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {allocationOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </TableCell>;
-                      }
-                      if (column.key === 'fieldReport') {
-                        return <TableCell key={`${item.id}-${column.key}`} className="py-2 text-center">
-                          <Button size="sm" className={cn(
-                            "text-white text-xs px-2.5 py-0.5 h-8 gap-1.5", 
-                            item.status === 'Pending' 
-                              ? "bg-blue-500 hover:bg-blue-600" 
-                              : "bg-gray-400 hover:bg-gray-500"
-                          )}>
-                            <Download size={12} />
-                            Download
-                          </Button>
-                        </TableCell>;
-                      }
-                      if (column.key === 'status') {
-                        return <TableCell key={`${item.id}-${column.key}`} className="py-2 text-center">
-                          <span className={cn("px-3 py-1 rounded-full text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
-                            {item.status}
-                          </span>
-                        </TableCell>;
-                      }
-                      if (column.key === 'claimNumber') {
-                        return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-2 text-blue-600 font-medium text-center">
-                          {item[column.key as keyof AuditData]}
-                        </TableCell>;
-                      }
-                      return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-2 text-center">
-                        {item[column.key as keyof AuditData]}
-                      </TableCell>;
-                    })}
-                  </TableRow>
-                )) : (
-                  <TableRow>
-                    <TableCell colSpan={displayColumns.length} className="h-32 text-center">
-                      No results found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+            <ScrollArea className="h-[calc(100vh-240px)]">
+              <div className="min-w-max">
+                <Table className="text-xs border-collapse table-auto w-full font-poppins">
+                  <TableHeader>
+                    <TableRow className="h-10">
+                      {displayColumns.map(column => (
+                        <TableHead 
+                          key={column.key} 
+                          onClick={() => handleSortChange(column.key)} 
+                          className={cn(
+                            "whitespace-pre-wrap text-xs py-2 cursor-pointer min-w-[90px] max-w-[130px] text-center", 
+                            sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
+                          )}
+                        >
+                          <div className="flex items-center justify-center">
+                            {column.title.length > 12 
+                              ? column.title.replace(/\s+/g, '\n')
+                              : column.title}
+                            {renderSortIndicator(column.key)}
+                          </div>
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currentItems.length > 0 ? currentItems.map(item => (
+                      <TableRow key={item.id} className="h-11 hover:bg-gray-50">
+                        {displayColumns.map(column => {
+                          if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
+                            return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                              <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
+                                <SelectTrigger className="w-[130px] h-7 text-xs mx-auto">
+                                  <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {allocationOptions.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </TableCell>;
+                          }
+                          if (column.key === 'fieldReport') {
+                            return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                              <Button size="sm" className={cn(
+                                "text-white text-xs px-2 py-0.5 h-7 gap-1", 
+                                item.status === 'Pending' 
+                                  ? "bg-blue-500 hover:bg-blue-600" 
+                                  : "bg-gray-400 hover:bg-gray-500"
+                              )}>
+                                <Download size={12} />
+                                Download
+                              </Button>
+                            </TableCell>;
+                          }
+                          if (column.key === 'status') {
+                            return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                              <span className={cn("px-2 py-1 rounded-full text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
+                                {item.status}
+                              </span>
+                            </TableCell>;
+                          }
+                          if (column.key === 'claimNumber') {
+                            return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium text-center">
+                              {item[column.key as keyof AuditData]}
+                            </TableCell>;
+                          }
+                          return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center">
+                            {item[column.key as keyof AuditData]}
+                          </TableCell>;
+                        })}
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={displayColumns.length} className="h-32 text-center">
+                          No results found
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </ScrollArea>
           </div>
           
           {totalPages > 0 && (
-            <div className="py-3 px-2 mt-auto flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between items-center border-t">
+            <div className="py-2 px-2 mt-auto flex flex-col sm:flex-row gap-1 sm:gap-0 sm:justify-between items-center border-t">
               <div className="text-xs text-gray-500 order-2 sm:order-1">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, sortedData.length)} of {sortedData.length} entries
               </div>
@@ -365,7 +374,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       onClick={() => handlePageChange(Math.max(1, currentPage - 1))} 
                       className={cn(
                         currentPage === 1 && "pointer-events-none opacity-50", 
-                        "text-xs h-8"
+                        "text-xs h-7"
                       )} 
                     />
                   </PaginationItem>
@@ -380,7 +389,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       <PaginationLink 
                         isActive={currentPage === pageNum} 
                         onClick={() => handlePageChange(pageNum)} 
-                        className="text-xs h-8 w-8"
+                        className="text-xs h-7 w-7"
                       >
                         {pageNum}
                       </PaginationLink>
@@ -392,7 +401,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))} 
                       className={cn(
                         currentPage === totalPages && "pointer-events-none opacity-50", 
-                        "text-xs h-8"
+                        "text-xs h-7"
                       )} 
                     />
                   </PaginationItem>
