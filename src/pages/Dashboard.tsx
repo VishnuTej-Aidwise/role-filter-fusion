@@ -92,7 +92,7 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
       
-      <div className={`flex-1 overflow-hidden transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
+      <div className={`flex-1 overflow-auto transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
         <div className="p-3 md:p-4 h-full flex flex-col">
           <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
             <h1 className="text-xl font-bold text-gray-800 mb-4">

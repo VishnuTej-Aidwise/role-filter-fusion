@@ -61,3 +61,34 @@
   background-color: #043C77;
   color: white;
 }
+
+/* Dashboard specific styles */
+.dashboard-container .pagination-container {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Ensure table container can scroll properly */
+.table-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+/* Make sure pagination is always visible */
+.pagination-wrapper {
+  margin-top: auto;
+  padding: 0.75rem;
+  background-color: white;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Responsive pagination */
+@media (max-width: 640px) {
+  .pagination-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
