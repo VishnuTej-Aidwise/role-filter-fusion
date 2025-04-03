@@ -176,6 +176,23 @@ const AuditTable: React.FC<AuditTableProps> = ({
     console.log(`Allocation changed for ${id} to ${value}`);
   };
 
+  const getAllocationOptions = () => {
+    if (role === 'ho_admin') {
+      return [
+        { value: 'ro_admin_1', label: 'RO Admin 1' },
+        { value: 'ro_admin_2', label: 'RO Admin 2' },
+        { value: 'ro_admin_3', label: 'RO Admin 3' },
+      ];
+    } else if (role === 'ro_admin') {
+      return [
+        { value: 'desk_auditor_1', label: 'Desk Auditor 1' },
+        { value: 'desk_auditor_2', label: 'Desk Auditor 2' },
+        { value: 'desk_auditor_3', label: 'Desk Auditor 3' },
+      ];
+    }
+    return [];
+  };
+
   const renderPaginationNumbers = () => {
     let pages = [];
     if (totalPages <= 5) {
@@ -235,6 +252,8 @@ const AuditTable: React.FC<AuditTableProps> = ({
     }
   };
 
+  const allocationOptions = getAllocationOptions();
+
   return <div className="w-full">
     {loading ? <div className="flex justify-center items-center h-28">
         <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-600"></div>
@@ -248,7 +267,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
         </div>
         
         <div className="overflow-x-auto">
-          <Table className="text-xs border-collapse table-auto w-full font-inter">
+          <Table className="text-xs border-collapse table-auto w-full font-poppins">
             <TableHeader>
               <TableRow>
                 {displayColumns.map(column => (
@@ -256,12 +275,14 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     key={column.key} 
                     onClick={() => handleSortChange(column.key)} 
                     className={cn(
-                      "whitespace-nowrap text-xs py-2.5 cursor-pointer", 
+                      "whitespace-pre-wrap text-xs py-2.5 cursor-pointer min-w-[100px] max-w-[150px] text-center", 
                       sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
                     )}
                   >
-                    <div className="flex items-center">
-                      {column.title}
+                    <div className="flex items-center justify-center">
+                      {column.title.length > 12 
+                        ? column.title.replace(/\s+/g, '\n')
+                        : column.title}
                       {renderSortIndicator(column.key)}
                     </div>
                   </TableHead>
@@ -273,26 +294,25 @@ const AuditTable: React.FC<AuditTableProps> = ({
                 <TableRow key={item.id} className="h-8 hover:bg-gray-50">
                   {displayColumns.map(column => {
                     if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
-                      return <TableCell key={`${item.id}-${column.key}`} className="py-1">
+                      return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
                         <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
-                          <SelectTrigger className="w-[120px] h-6 text-xs">
+                          <SelectTrigger className="w-[120px] h-6 text-xs mx-auto">
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="ro_admin_1">RO Admin 1</SelectItem>
-                            <SelectItem value="ro_admin_2">RO Admin 2</SelectItem>
-                            <SelectItem value="ro_admin_3">RO Admin 3</SelectItem>
-                            <SelectItem value="desk_auditor_1">Desk Auditor 1</SelectItem>
+                            {allocationOptions.map(option => (
+                              <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </TableCell>;
                     }
                     if (column.key === 'fieldReport') {
-                      return <TableCell key={`${item.id}-${column.key}`} className="py-1">
+                      return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
                         <Button size="sm" className={cn(
                           "text-white text-xs px-2.5 py-0.5 h-6 gap-1.5", 
                           item.status === 'Pending' 
-                            ? "bg-blue-600 hover:bg-blue-700" 
+                            ? "bg-blue-500 hover:bg-blue-600" 
                             : "bg-gray-400 hover:bg-gray-500"
                         )}>
                           <Download size={12} />
@@ -301,18 +321,18 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       </TableCell>;
                     }
                     if (column.key === 'status') {
-                      return <TableCell key={`${item.id}-${column.key}`} className="py-1">
-                        <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium", getStatusBadgeClass(item.status))}>
+                      return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                        <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
                           {item.status}
                         </span>
                       </TableCell>;
                     }
                     if (column.key === 'claimNumber') {
-                      return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium">
+                      return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium text-center">
                         {item[column.key as keyof AuditData]}
                       </TableCell>;
                     }
-                    return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1">
+                    return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center">
                       {item[column.key as keyof AuditData]}
                     </TableCell>;
                   })}

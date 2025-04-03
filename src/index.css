@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -84,7 +85,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
   }
 }
 
@@ -252,6 +253,8 @@
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  display: inline-block;
+  width: auto;
 }
 
 .status-pending {
@@ -260,22 +263,28 @@
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  display: inline-block;
+  width: auto;
 }
 
 .status-desk-audit {
-  background-color: #fff7ed;
-  color: #c2410c;
+  background-color: #fef3c7;
+  color: #92400e;
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  display: inline-block;
+  width: auto;
 }
 
 .status-claim-processing {
-  background-color: #faf5ff;
+  background-color: #f3e8ff;
   color: #6b21a8;
   padding: 4px 8px;
   border-radius: 9999px;
   font-weight: 500;
+  display: inline-block;
+  width: auto;
 }
 
 /* Sort indicators */
@@ -323,5 +332,18 @@
 }
 
 .table-download-btn {
-  @apply bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded flex items-center gap-1.5 transition-colors;
+  @apply bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors;
+}
+
+/* Filter chip styles */
+.filter-chip {
+  @apply bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full flex items-center gap-1;
+}
+
+.filter-chip button {
+  @apply text-gray-500 hover:text-gray-700;
+}
+
+.filter-chip-clear-all {
+  @apply text-blue-600 hover:text-blue-800 text-xs font-medium;
 }

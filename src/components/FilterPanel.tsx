@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { useAuth, UserRole } from '../contexts/AuthContext';
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface FilterPanelProps {
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilters }) => {
+  const { user } = useAuth();
   const [filters, setFilters] = useState({
     provider: '',
     pathologist: '',
@@ -19,12 +21,67 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
     doctor: '',
     trigger: ''
   });
+  
+  const [selectedFilters, setSelectedFilters] = useState<Array<{key: string, value: string, label: string}>>([]);
+
+  const filterOptions = {
+    provider: [
+      { value: 'provider1', label: 'Provider 1' },
+      { value: 'provider2', label: 'Provider 2' },
+      { value: 'provider3', label: 'Provider 3' },
+    ],
+    pathologist: [
+      { value: 'path1', label: 'Pathologist 1' },
+      { value: 'path2', label: 'Pathologist 2' },
+      { value: 'path3', label: 'Pathologist 3' },
+    ],
+    pharmacy: [
+      { value: 'pharm1', label: 'Pharmacy 1' },
+      { value: 'pharm2', label: 'Pharmacy 2' },
+      { value: 'pharm3', label: 'Pharmacy 3' },
+    ],
+    doctor: [
+      { value: 'doctor1', label: 'Doctor 1' },
+      { value: 'doctor2', label: 'Doctor 2' },
+      { value: 'doctor3', label: 'Doctor 3' },
+    ],
+    trigger: [
+      { value: 'ai', label: 'AI' },
+      { value: 'manual', label: 'Manual' },
+    ],
+  };
 
   const handleFilterChange = (name: string, value: string) => {
+    if (value) {
+      const option = filterOptions[name as keyof typeof filterOptions].find(opt => opt.value === value);
+      if (option) {
+        // Add to selected filters if not already there
+        if (!selectedFilters.some(f => f.key === name && f.value === value)) {
+          setSelectedFilters([...selectedFilters, {
+            key: name,
+            value: value,
+            label: option.label
+          }]);
+        }
+      }
+    }
+
     setFilters(prev => ({
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleRemoveFilter = (key: string, value: string) => {
+    setSelectedFilters(selectedFilters.filter(f => !(f.key === key && f.value === value)));
+    
+    // If we're removing the current value, reset it in the filters state
+    if (filters[key as keyof typeof filters] === value) {
+      setFilters(prev => ({
+        ...prev,
+        [key]: ''
+      }));
+    }
   };
 
   const handleClearAll = () => {
@@ -35,6 +92,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
       doctor: '',
       trigger: ''
     });
+    setSelectedFilters([]);
   };
 
   const handleApplyFilters = () => {
@@ -47,12 +105,42 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center animate-fade-in">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-auto animate-fade-in glass-effect">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Filters</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X size={20} />
           </button>
         </div>
+        
+        {selectedFilters.length > 0 && (
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-700">Selected Filters</span>
+              <button 
+                onClick={handleClearAll}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                CLEAR ALL
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {selectedFilters.map((filter, index) => (
+                <div 
+                  key={index}
+                  className="bg-gray-200 rounded-md py-1 px-3 flex items-center gap-1.5 text-sm"
+                >
+                  <span>{filter.label}</span>
+                  <button 
+                    onClick={() => handleRemoveFilter(filter.key, filter.value)}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         <div className="space-y-4">
           <div className="space-y-2">
@@ -65,9 +153,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
                 <SelectValue placeholder="Select Provider" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="provider1">Provider 1</SelectItem>
-                <SelectItem value="provider2">Provider 2</SelectItem>
-                <SelectItem value="provider3">Provider 3</SelectItem>
+                {filterOptions.provider.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -82,9 +170,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
                 <SelectValue placeholder="Select Pathologist" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="path1">Pathologist 1</SelectItem>
-                <SelectItem value="path2">Pathologist 2</SelectItem>
-                <SelectItem value="path3">Pathologist 3</SelectItem>
+                {filterOptions.pathologist.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -99,9 +187,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
                 <SelectValue placeholder="Select Pharmacy" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pharm1">Pharmacy 1</SelectItem>
-                <SelectItem value="pharm2">Pharmacy 2</SelectItem>
-                <SelectItem value="pharm3">Pharmacy 3</SelectItem>
+                {filterOptions.pharmacy.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -116,9 +204,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
                 <SelectValue placeholder="Select Doctor" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="doctor1">Doctor 1</SelectItem>
-                <SelectItem value="doctor2">Doctor 2</SelectItem>
-                <SelectItem value="doctor3">Doctor 3</SelectItem>
+                {filterOptions.doctor.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -133,17 +221,15 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ isOpen, onClose, onApplyFilte
                 <SelectValue placeholder="Select Trigger Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ai">AI</SelectItem>
-                <SelectItem value="manual">Manual</SelectItem>
+                {filterOptions.trigger.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
         </div>
         
-        <div className="flex justify-between mt-8">
-          <Button variant="outline" onClick={handleClearAll}>
-            Clear all
-          </Button>
+        <div className="flex justify-end mt-8">
           <Button onClick={handleApplyFilters}>
             Apply now
           </Button>
