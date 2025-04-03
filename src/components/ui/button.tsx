@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -5,19 +6,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 font-poppins",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        default: "bg-[#0184FF] text-white hover:bg-[#0062cc]", // Primary button
+        secondary: "bg-[#DEDFF] text-[#0F172A] hover:bg-gray-200", // Secondary button
+        destructive: "bg-[#F1272A] text-white hover:bg-red-700", // Danger button
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground", // Outlined button
+        ghost: "hover:bg-accent hover:text-accent-foreground", // Ghost button
+        link: "text-[#0184FF] underline-offset-4 hover:underline", // Text button
+        success: "bg-[#008B1C] text-white hover:bg-green-700", // Success button
+        warning: "bg-[#B75A00] text-white hover:bg-amber-700", // Warning button
+        disabled: "bg-[#F1F5F9] text-[#8295A7] cursor-not-allowed hover:bg-[#F1F5F9]", // Disabled button
       },
       size: {
         default: "h-10 px-4 py-2",

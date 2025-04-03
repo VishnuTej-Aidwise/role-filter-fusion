@@ -30,24 +30,30 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#0184FF', // Primary color from HITPA theme
+					foreground: '#FFFFFF',
+					hover: '#0062cc',
+					text: '#0F172A' // Primary text from HITPA theme
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#DEDFF', // Secondary color from HITPA theme
+					foreground: '#0F172A',
+					text: '#647488' // Secondary text from HITPA theme
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: '#F1272A', // Danger text from HITPA theme
+					foreground: '#FFFFFF',
+					background: '#FFE2E1' // Danger background from HITPA theme
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: '#043C77', // Accent main from HITPA theme
+					foreground: '#FFFFFF',
+					light: '#8BD0FF', // Accent 1 from HITPA theme
+					lighter: '#84BDFF' // Accent 2 from HITPA theme
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -57,28 +63,38 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				warning: {
+					DEFAULT: '#B75A00', // Warning text from HITPA theme
+					foreground: '#FFFFFF',
+					background: '#FFF7E1' // Warning background from HITPA theme
 				},
-				navy: {
-					DEFAULT: '#003366',
-					dark: '#002244',
-					light: '#004488'
+				success: {
+					DEFAULT: '#008B1C', // Success text from HITPA theme
+					foreground: '#FFFFFF',
+					background: '#D0FFEB' // Success background from HITPA theme
+				},
+				disabled: {
+					DEFAULT: '#8295A7', // Disabled text from HITPA theme
+					foreground: '#0F172A',
+					container: '#F1F5F9' // Disabled container from HITPA theme
+				},
+				sidebar: {
+					DEFAULT: '#0184FF', // Using primary color for sidebar background
+					foreground: '#FFFFFF',
+					primary: '#0184FF',
+					'primary-foreground': '#FFFFFF',
+					accent: '#043C77',
+					'accent-foreground': '#FFFFFF',
+					border: '#0062cc',
+					ring: '#0062cc'
 				},
 				status: {
-					completed: '#dcfce7',
-					'completed-text': '#15803d',
+					completed: '#D0FFEB',
+					'completed-text': '#008B1C',
 					pending: '#dbeafe',
-					'pending-text': '#1e40af',
-					'desk-audit': '#fef3c7',
-					'desk-audit-text': '#92400e',
+					'pending-text': '#0184FF',
+					'desk-audit': '#FFF7E1',
+					'desk-audit-text': '#B75A00',
 					'claim-processing': '#f3e8ff',
 					'claim-processing-text': '#6b21a8',
 				}
