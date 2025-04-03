@@ -75,6 +75,7 @@
   flex-direction: column;
   min-height: 0;
   flex: 1;
+  min-height: calc(100vh - 220px);
 }
 
 /* Make sure pagination is always visible */
@@ -91,4 +92,66 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+}
+
+/* Enhanced table styles */
+[data-chart="table"] {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+[data-chart="table"] th,
+[data-chart="table"] td {
+  text-align: center;
+}
+
+[data-chart="table"] th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #0F172A;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+}
+
+[data-chart="table"] td {
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-chart="table"] tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Status badge styles */
+.bg-status-completed {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+.text-status-completed-text {
+  color: rgb(6, 95, 70);
+}
+
+.bg-status-pending {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+.text-status-pending-text {
+  color: rgb(146, 64, 14);
+}
+
+.bg-status-desk-audit {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+.text-status-desk-audit-text {
+  color: rgb(67, 56, 202);
+}
+
+.bg-status-claim-processing {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+.text-status-claim-processing-text {
+  color: rgb(79, 70, 229);
 }

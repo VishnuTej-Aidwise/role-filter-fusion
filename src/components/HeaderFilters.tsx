@@ -39,15 +39,15 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
 
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-2">
-        <div className="flex flex-col md:flex-row md:items-end gap-4 flex-1">
+      <div className="flex flex-col sm:flex-row sm:items-end gap-2 mb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:items-end gap-2 flex-1">
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-700">Hospital Name:</label>
             <Select value={hospital} onValueChange={(value) => {
               setHospital(value);
               handleBasicFilterChange();
             }}>
-              <SelectTrigger className="w-full md:w-[180px] h-8 text-xs">
+              <SelectTrigger className="w-full md:w-[160px] h-8 text-xs">
                 <SelectValue placeholder="Select Hospital" />
               </SelectTrigger>
               <SelectContent>
@@ -60,7 +60,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
 
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-700">Date Range:</label>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Input
                 type="date"
                 placeholder="From"
@@ -69,7 +69,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
                   setDateFrom(e.target.value);
                   handleBasicFilterChange();
                 }}
-                className="w-full md:w-[140px] h-8 text-xs"
+                className="w-full md:w-[125px] h-8 text-xs"
               />
               <span className="text-gray-500 text-xs">to</span>
               <Input
@@ -80,28 +80,28 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
                   setDateTo(e.target.value);
                   handleBasicFilterChange();
                 }}
-                className="w-full md:w-[140px] h-8 text-xs"
+                className="w-full md:w-[125px] h-8 text-xs"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end ml-auto">
+        <div className="flex items-center gap-2 self-end sm:ml-auto">
           <Button 
             variant="outline" 
             size="sm"
             onClick={() => setIsFilterPanelOpen(true)}
-            className="flex items-center gap-1 h-8 text-xs"
+            className="flex items-center gap-1 h-7 text-xs"
           >
-            <Filter size={14} />
+            <Filter size={12} />
             More Filters
           </Button>
           <Button 
             size="sm"
             onClick={onExport}
-            className="flex items-center gap-1 h-8 text-xs bg-blue-500 hover:bg-blue-600"
+            className="flex items-center gap-1 h-7 text-xs bg-blue-500 hover:bg-blue-600"
           >
-            <Download size={14} />
+            <Download size={12} />
             Download Excel
           </Button>
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -264,7 +263,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 pb-3 gap-2 border-b">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-2 pb-2 gap-2 border-b">
             <div className="relative w-full sm:w-[240px]">
               <Search size={15} className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <Input type="text" placeholder="Search claims..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-8 text-xs w-full" />
@@ -275,13 +274,13 @@ const AuditTable: React.FC<AuditTableProps> = ({
           <div className="overflow-x-auto flex-grow">
             <Table className="text-xs border-collapse table-auto w-full font-poppins">
               <TableHeader>
-                <TableRow>
+                <TableRow className="h-10">
                   {displayColumns.map(column => (
                     <TableHead 
                       key={column.key} 
                       onClick={() => handleSortChange(column.key)} 
                       className={cn(
-                        "whitespace-pre-wrap text-xs py-2.5 cursor-pointer min-w-[100px] max-w-[150px] text-center", 
+                        "whitespace-pre-wrap text-xs py-3 cursor-pointer min-w-[100px] max-w-[150px] text-center", 
                         sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
                       )}
                     >
@@ -297,12 +296,12 @@ const AuditTable: React.FC<AuditTableProps> = ({
               </TableHeader>
               <TableBody>
                 {currentItems.length > 0 ? currentItems.map(item => (
-                  <TableRow key={item.id} className="h-8 hover:bg-gray-50">
+                  <TableRow key={item.id} className="h-12 hover:bg-gray-50">
                     {displayColumns.map(column => {
                       if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
-                        return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                        return <TableCell key={`${item.id}-${column.key}`} className="py-2 text-center">
                           <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
-                            <SelectTrigger className="w-[120px] h-6 text-xs mx-auto">
+                            <SelectTrigger className="w-[130px] h-8 text-xs mx-auto">
                               <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
@@ -314,9 +313,9 @@ const AuditTable: React.FC<AuditTableProps> = ({
                         </TableCell>;
                       }
                       if (column.key === 'fieldReport') {
-                        return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                        return <TableCell key={`${item.id}-${column.key}`} className="py-2 text-center">
                           <Button size="sm" className={cn(
-                            "text-white text-xs px-2.5 py-0.5 h-6 gap-1.5", 
+                            "text-white text-xs px-2.5 py-0.5 h-8 gap-1.5", 
                             item.status === 'Pending' 
                               ? "bg-blue-500 hover:bg-blue-600" 
                               : "bg-gray-400 hover:bg-gray-500"
@@ -327,18 +326,18 @@ const AuditTable: React.FC<AuditTableProps> = ({
                         </TableCell>;
                       }
                       if (column.key === 'status') {
-                        return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
-                          <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
+                        return <TableCell key={`${item.id}-${column.key}`} className="py-2 text-center">
+                          <span className={cn("px-3 py-1 rounded-full text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
                             {item.status}
                           </span>
                         </TableCell>;
                       }
                       if (column.key === 'claimNumber') {
-                        return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium text-center">
+                        return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-2 text-blue-600 font-medium text-center">
                           {item[column.key as keyof AuditData]}
                         </TableCell>;
                       }
-                      return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center">
+                      return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-2 text-center">
                         {item[column.key as keyof AuditData]}
                       </TableCell>;
                     })}
@@ -355,7 +354,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
           </div>
           
           {totalPages > 0 && (
-            <div className="py-4 px-2 mt-auto flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between items-center border-t">
+            <div className="py-3 px-2 mt-auto flex flex-col sm:flex-row gap-2 sm:gap-0 sm:justify-between items-center border-t">
               <div className="text-xs text-gray-500 order-2 sm:order-1">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, sortedData.length)} of {sortedData.length} entries
               </div>
