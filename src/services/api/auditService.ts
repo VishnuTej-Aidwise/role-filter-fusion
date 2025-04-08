@@ -4,34 +4,33 @@ import apiClient from './apiClient';
 export interface DeskAuditParams {
   start_date: string;
   end_date: string;
-  trigger_type: string;
+  trigger_type?: string;
   page_no?: number;
   page_size?: number;
 }
 
 export interface DeskAuditItem {
-  id: string;
-  claim_number: string;
-  member_id: string;
-  member_name: string;
-  hospital_name: string;
-  admission_date: string;
-  discharge_date: string;
-  claim_amount: number;
-  status: string;
-  trigger_type: string;
-  created_at: string;
-  updated_at: string;
-  // Add other fields based on actual API response
+  Id: number;
+  ClaimId: string;
+  ClaimedDate: string;
+  HitpaLocation: string | null;
+  DateOfAdmission: string;
+  DateOfDischarge: string;
+  FraudTrigger: string;
+  FraudInvestigationDate: string | null;
+  ClaimStatus: string | null;
+  DeskAuditReferralDate: string | null;
+  TatCompliance: string | null;
+  ClaimIntimationAging: string | null;
+  TriggerType: string;
+  HospitalId: string;
 }
 
 export interface DeskAuditResponse {
   data: DeskAuditItem[];
-  total: number;
-  page: number;
-  page_size: number;
   message: string;
   status: boolean;
+  total_rec: number;
 }
 
 export const fetchDeskAudits = async (params: DeskAuditParams): Promise<DeskAuditResponse> => {
@@ -40,7 +39,6 @@ export const fetchDeskAudits = async (params: DeskAuditParams): Promise<DeskAudi
       params: {
         start_date: params.start_date,
         end_date: params.end_date,
-        trigger_type: params.trigger_type,
         page_no: params.page_no || 1,
         page_size: params.page_size || 10
       } 

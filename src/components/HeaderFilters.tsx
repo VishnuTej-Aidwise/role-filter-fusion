@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Download } from 'lucide-react';
+import { CalendarIcon, Download, SlidersHorizontal } from 'lucide-react';
 
 interface HeaderFiltersProps {
   onFilter: (filters: any) => void;
   onExport: () => void;
+  onAdvancedFilter?: () => void;
   defaultFilters?: {
     startDate?: string;
     endDate?: string;
@@ -22,6 +23,7 @@ interface HeaderFiltersProps {
 const HeaderFilters: React.FC<HeaderFiltersProps> = ({ 
   onFilter, 
   onExport,
+  onAdvancedFilter,
   defaultFilters = {}
 }) => {
   const [startDate, setStartDate] = useState<string>(defaultFilters.startDate || format(new Date(), 'yyyy-MM-dd'));
@@ -138,6 +140,17 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({
         >
           Apply Filter
         </Button>
+        
+        {onAdvancedFilter && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-blue-200 text-blue-600 hover:bg-blue-50 h-9"
+            onClick={onAdvancedFilter}
+          >
+            <SlidersHorizontal className="w-4 h-4 mr-1" /> More Filters
+          </Button>
+        )}
       </div>
       
       <Button 

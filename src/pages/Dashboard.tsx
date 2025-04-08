@@ -6,7 +6,9 @@ import { useAuth, UserRole } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import HeaderFilters from '../components/HeaderFilters';
 import AuditTable from '../components/AuditTable';
+import FilterPanel from '../components/FilterPanel';
 import { fetchDeskAudits, DeskAuditParams, DeskAuditItem } from '../services/api/auditService';
+import { fetchSubUsers } from '../services/api/userService';
 import { format } from 'date-fns';
 
 interface DashboardParams {
@@ -42,6 +44,8 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [subUsers, setSubUsers] = useState<any[]>([]);
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -51,10 +55,22 @@ const Dashboard: React.FC = () => {
     endDate: string;
     triggerType: string;
   }>({
-    startDate: format(new Date(), 'yyyy-MM-dd'),
-    endDate: format(new Date(), 'yyyy-MM-dd'),
-    triggerType: 'Ai', // Default trigger type
+    startDate: '2023-01-01', // Default to 2023-01-01
+    endDate: '2024-01-01',   // Default to 2024-01-01
+    triggerType: 'Ai',       // Default trigger type
   });
+
+  // Fetch sub-users based on role
+  const fetchUsersByRole = async () => {
+    if (role === 'ro_admin' || role === 'ho_admin') {
+      try {
+        const users = await fetchSubUsers();
+        setSubUsers(users);
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to fetch users');
+      }
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -63,7 +79,6 @@ const Dashboard: React.FC = () => {
       const params: DeskAuditParams = {
         start_date: filters.startDate,
         end_date: filters.endDate,
-        trigger_type: filters.triggerType,
         page_no: pagination.page,
         page_size: pagination.pageSize
       };
@@ -72,28 +87,28 @@ const Dashboard: React.FC = () => {
       
       // Map API response to AuditData format
       const mappedData: AuditData[] = response.data.map(item => ({
-        id: item.id,
-        claimNumber: item.claim_number,
-        claimDate: item.created_at.split('T')[0], // Assuming created_at contains claim date
-        hospitalName: item.hospital_name,
-        hospitalLocation: '', // Not available in API response
-        htpaLocation: '', // Not available in API response
-        dateOfAdmission: item.admission_date,
-        dateOfDischarge: item.discharge_date,
-        fraudTriggers: '', // Not available in API response
-        fieldInvestigationDate: '', // Not available in API response
-        claimStatus: '', // Not available in API response
-        status: item.status,
-        deskAuditReferralDate: '', // Not available in API response
-        taTCompliance: '', // Not available in API response
-        claimIntimationAging: '', // Not available in API response
-        aiManualTrigger: item.trigger_type,
-        allocation: '', // Will be populated from another API call if needed
+        id: item.Id.toString(),
+        claimNumber: item.ClaimId,
+        claimDate: item.ClaimedDate,
+        hospitalName: item.HospitalId, // This might need to be fetched separately
+        hospitalLocation: '',
+        htpaLocation: item.HitpaLocation || '',
+        dateOfAdmission: item.DateOfAdmission,
+        dateOfDischarge: item.DateOfDischarge,
+        fraudTriggers: item.FraudTrigger,
+        fieldInvestigationDate: item.FraudInvestigationDate || '',
+        claimStatus: item.ClaimStatus || '',
+        status: item.ClaimStatus || 'Pending', // Using ClaimStatus or default to 'Pending'
+        deskAuditReferralDate: item.DeskAuditReferralDate || '',
+        taTCompliance: item.TatCompliance || '',
+        claimIntimationAging: item.ClaimIntimationAging || '',
+        aiManualTrigger: item.TriggerType,
+        allocation: '', // Will be populated from sub-users if needed
         fieldReport: '' // Not available in API response
       }));
       
       setData(mappedData);
-      setTotalItems(response.total || response.data.length);
+      setTotalItems(response.total_rec);
       setLoading(false);
     } catch (error: any) {
       toast.error(error.message || 'Failed to fetch audit data');
@@ -105,6 +120,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
+      fetchUsersByRole();
     }
   }, [pagination.page, pagination.pageSize, isAuthenticated]);
 
@@ -141,8 +157,8 @@ const Dashboard: React.FC = () => {
     
     // Update filters state with the new values
     setFilters({
-      startDate: filters.startDate || format(new Date(), 'yyyy-MM-dd'),
-      endDate: filters.endDate || format(new Date(), 'yyyy-MM-dd'),
+      startDate: filters.startDate || '2023-01-01',
+      endDate: filters.endDate || '2024-01-01',
       triggerType: filters.triggerType || 'Ai'
     });
     
@@ -174,6 +190,16 @@ const Dashboard: React.FC = () => {
       pageSize
     });
   };
+  
+  const handleAdvancedFilter = () => {
+    setIsFilterPanelOpen(true);
+  };
+
+  const handleApplyAdvancedFilters = (advancedFilters: any) => {
+    // Apply advanced filters here
+    toast.success('Applied advanced filters');
+    // You would update the fetch params with these filters
+  };
 
   // Generate title based on role
   const getDashboardTitle = () => {
@@ -201,8 +227,9 @@ const Dashboard: React.FC = () => {
             </h1>
             
             <HeaderFilters 
-              onFilter={handleFilter} 
+              onFilter={handleFilter}
               onExport={handleExport}
+              onAdvancedFilter={handleAdvancedFilter}
               defaultFilters={{
                 startDate: filters.startDate,
                 endDate: filters.endDate,
@@ -213,19 +240,27 @@ const Dashboard: React.FC = () => {
           
           <div className="bg-white rounded-lg shadow-sm flex-1 overflow-hidden flex flex-col">
             <AuditTable 
-              data={data} 
-              loading={loading} 
-              pagination={{
+              data={data}
+              loading={loading}
+              paginationProps={{
                 page: pagination.page,
                 pageSize: pagination.pageSize,
                 total: totalItems,
                 onPageChange: handlePageChange,
                 onPageSizeChange: handlePageSizeChange
               }}
+              subUsers={subUsers}
+              userRole={role}
             />
           </div>
         </div>
       </div>
+      
+      <FilterPanel 
+        isOpen={isFilterPanelOpen}
+        onClose={() => setIsFilterPanelOpen(false)}
+        onApplyFilters={handleApplyAdvancedFilters}
+      />
     </div>
   );
 };
