@@ -6,8 +6,6 @@ export interface SubUser {
   name: string;
   email: string;
   role: string;
-  status: string;
-  // Add other fields based on actual API response
 }
 
 export interface SubUsersResponse {
@@ -16,12 +14,12 @@ export interface SubUsersResponse {
   status: boolean;
 }
 
-export const fetchSubUsers = async (): Promise<SubUsersResponse> => {
+export const fetchSubUsers = async (): Promise<SubUser[]> => {
   try {
     const response = await apiClient.get<SubUsersResponse>('/user/sub-users');
-    return response.data;
+    return response.data.data || [];
   } catch (error: any) {
-    console.error('Error fetching sub-users:', error);
-    throw new Error(error.response?.data?.message || 'Failed to fetch users');
+    console.error('Error fetching sub users:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch sub users');
   }
 };

@@ -13,10 +13,32 @@ interface DashboardParams {
   role: UserRole;
 }
 
+// Updated AuditData to match the DeskAuditItem interface structure from API
+interface AuditData {
+  id: string;
+  claimNumber: string;
+  claimDate: string;
+  hospitalName: string;
+  hospitalLocation: string;
+  htpaLocation: string;
+  dateOfAdmission: string;
+  dateOfDischarge: string;
+  fraudTriggers: string;
+  fieldInvestigationDate: string;
+  claimStatus: string;
+  status: string;
+  deskAuditReferralDate: string;
+  taTCompliance: string;
+  claimIntimationAging: string;
+  aiManualTrigger: string;
+  allocation?: string;
+  fieldReport: string;
+}
+
 const Dashboard: React.FC = () => {
   const { role } = useParams<{ role: string }>() as { role: UserRole };
   const { user, isAuthenticated } = useAuth();
-  const [data, setData] = useState<DeskAuditItem[]>([]);
+  const [data, setData] = useState<AuditData[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
@@ -48,7 +70,29 @@ const Dashboard: React.FC = () => {
       
       const response = await fetchDeskAudits(params);
       
-      setData(response.data);
+      // Map API response to AuditData format
+      const mappedData: AuditData[] = response.data.map(item => ({
+        id: item.id,
+        claimNumber: item.claim_number,
+        claimDate: item.created_at.split('T')[0], // Assuming created_at contains claim date
+        hospitalName: item.hospital_name,
+        hospitalLocation: '', // Not available in API response
+        htpaLocation: '', // Not available in API response
+        dateOfAdmission: item.admission_date,
+        dateOfDischarge: item.discharge_date,
+        fraudTriggers: '', // Not available in API response
+        fieldInvestigationDate: '', // Not available in API response
+        claimStatus: '', // Not available in API response
+        status: item.status,
+        deskAuditReferralDate: '', // Not available in API response
+        taTCompliance: '', // Not available in API response
+        claimIntimationAging: '', // Not available in API response
+        aiManualTrigger: item.trigger_type,
+        allocation: '', // Will be populated from another API call if needed
+        fieldReport: '' // Not available in API response
+      }));
+      
+      setData(mappedData);
       setTotalItems(response.total || response.data.length);
       setLoading(false);
     } catch (error: any) {
