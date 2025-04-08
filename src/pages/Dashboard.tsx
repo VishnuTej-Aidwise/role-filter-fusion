@@ -6,7 +6,8 @@ import { useAuth, UserRole } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import HeaderFilters from '../components/HeaderFilters';
 import AuditTable from '../components/AuditTable';
-import { mockAuditData } from '../utils/mockData';
+import { fetchDeskAudits, DeskAuditParams, DeskAuditItem } from '../services/api/auditService';
+import { format } from 'date-fns';
 
 interface DashboardParams {
   role: UserRole;
@@ -15,20 +16,55 @@ interface DashboardParams {
 const Dashboard: React.FC = () => {
   const { role } = useParams<{ role: string }>() as { role: UserRole };
   const { user, isAuthenticated } = useAuth();
-  const [data, setData] = useState(mockAuditData);
-  const [filteredData, setFilteredData] = useState(mockAuditData);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<DeskAuditItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+  });
+  const [filters, setFilters] = useState<{
+    startDate: string;
+    endDate: string;
+    triggerType: string;
+  }>({
+    startDate: format(new Date(), 'yyyy-MM-dd'),
+    endDate: format(new Date(), 'yyyy-MM-dd'),
+    triggerType: 'Ai', // Default trigger type
+  });
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      
+      const params: DeskAuditParams = {
+        start_date: filters.startDate,
+        end_date: filters.endDate,
+        trigger_type: filters.triggerType,
+        page_no: pagination.page,
+        page_size: pagination.pageSize
+      };
+      
+      const response = await fetchDeskAudits(params);
+      
+      setData(response.data);
+      setTotalItems(response.total || response.data.length);
+      setLoading(false);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to fetch audit data');
+      setLoading(false);
+      setData([]);
+    }
+  };
 
   useEffect(() => {
-    // Simulate data loading
-    setLoading(true);
-    setTimeout(() => {
-      setData(mockAuditData);
-      setFilteredData(mockAuditData);
-      setLoading(false);
-    }, 500);
-    
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [pagination.page, pagination.pageSize, isAuthenticated]);
+
+  useEffect(() => {
     // Listen for sidebar expansion/collapse
     const handleSidebarChange = () => {
       const sidebar = document.querySelector('[class*="w-64"]');
@@ -59,19 +95,40 @@ const Dashboard: React.FC = () => {
   const handleFilter = (filters: any) => {
     setLoading(true);
     
-    // Simulate filtering data
-    setTimeout(() => {
-      console.log('Applied filters:', filters);
-      // In a real app, you would filter the data based on the filters
-      // For demo purposes, we'll just show all data
-      setFilteredData(data);
-      setLoading(false);
-    }, 500);
+    // Update filters state with the new values
+    setFilters({
+      startDate: filters.startDate || format(new Date(), 'yyyy-MM-dd'),
+      endDate: filters.endDate || format(new Date(), 'yyyy-MM-dd'),
+      triggerType: filters.triggerType || 'Ai'
+    });
+    
+    // Reset pagination to first page
+    setPagination(prev => ({
+      ...prev,
+      page: 1
+    }));
+    
+    // Fetch data with updated filters
+    fetchData();
   };
 
   const handleExport = () => {
     toast.success('Exporting data to Excel...');
     // In a real app, you would generate and download an Excel file
+  };
+
+  const handlePageChange = (page: number) => {
+    setPagination(prev => ({
+      ...prev,
+      page
+    }));
+  };
+
+  const handlePageSizeChange = (pageSize: number) => {
+    setPagination({
+      page: 1, // Reset to first page when changing page size
+      pageSize
+    });
   };
 
   // Generate title based on role
@@ -99,11 +156,29 @@ const Dashboard: React.FC = () => {
               {getDashboardTitle()}
             </h1>
             
-            <HeaderFilters onFilter={handleFilter} onExport={handleExport} />
+            <HeaderFilters 
+              onFilter={handleFilter} 
+              onExport={handleExport}
+              defaultFilters={{
+                startDate: filters.startDate,
+                endDate: filters.endDate,
+                triggerType: filters.triggerType
+              }}
+            />
           </div>
           
           <div className="bg-white rounded-lg shadow-sm flex-1 overflow-hidden flex flex-col">
-            <AuditTable data={filteredData} loading={loading} />
+            <AuditTable 
+              data={data} 
+              loading={loading} 
+              pagination={{
+                page: pagination.page,
+                pageSize: pagination.pageSize,
+                total: totalItems,
+                onPageChange: handlePageChange,
+                onPageSizeChange: handlePageSizeChange
+              }}
+            />
           </div>
         </div>
       </div>
