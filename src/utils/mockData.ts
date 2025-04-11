@@ -32,7 +32,7 @@ export const mockAuditData = [
     fraudTriggers: 'Duplicate Claim',
     fieldInvestigationDate: '28-02-2025',
     claimStatus: 'Processed',
-    status: 'Claim Processing',
+    status: 'Approved',
     deskAuditReferralDate: '01-03-2025',
     taTCompliance: '+3 Days',
     claimIntimationAging: '-2 Days',
@@ -52,7 +52,7 @@ export const mockAuditData = [
     fraudTriggers: 'Duplicate Claim',
     fieldInvestigationDate: '28-02-2025',
     claimStatus: 'Processed',
-    status: 'Claim Processing',
+    status: 'Rejected',
     deskAuditReferralDate: '01-03-2025',
     taTCompliance: '+3 Days',
     claimIntimationAging: '-2 Days',
@@ -140,4 +140,12 @@ export const mockAuditData = [
     allocation: 'RO Admin 2',
     fieldReport: 'Download Report'
   }
+];
+
+export const mockFindings = [
+  { id: '1', description: 'Duplicate Claim Detected', status: 'pending' },
+  { id: '2', description: 'Billing Error', status: 'pending' },
+  { id: '3', description: 'Policy Violation', status: 'pending' },
+  { id: '4', description: 'Incorrect Treatment Code', status: 'pending' },
+  { id: '5', description: 'Missing Documentation', status: 'pending' }
 ];

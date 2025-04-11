@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserRole } from '@/contexts/AuthContext';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
+import ClaimDetailsModal from './ClaimDetailsModal';
 
 interface PaginationProps {
   page: number;
@@ -14,6 +15,26 @@ interface PaginationProps {
   total: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
+}
+
+export interface ColumnVisibility {
+  claimNumber: boolean;
+  claimDate: boolean;
+  hospitalName: boolean;
+  hospitalLocation: boolean;
+  htpaLocation: boolean;
+  dateOfAdmission: boolean;
+  dateOfDischarge: boolean;
+  fraudTriggers: boolean;
+  fieldInvestigationDate: boolean;
+  claimStatus: boolean;
+  status: boolean;
+  deskAuditReferralDate: boolean;
+  taTCompliance: boolean;
+  claimIntimationAging: boolean;
+  aiManualTrigger: boolean;
+  allocation: boolean;
+  fieldReport: boolean;
 }
 
 export interface AuditTableProps {
@@ -32,7 +53,9 @@ const AuditTable: React.FC<AuditTableProps> = ({
   userRole
 }) => {
   const { page, pageSize, total, onPageChange, onPageSizeChange } = paginationProps;
-  const [columnVisibility, setColumnVisibility] = useState({
+  const [selectedClaim, setSelectedClaim] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     claimNumber: true,
     claimDate: true,
     hospitalName: true,
@@ -52,14 +75,19 @@ const AuditTable: React.FC<AuditTableProps> = ({
     fieldReport: true,
   });
 
-  const toggleColumnVisibility = (columnKey: string) => {
+  const toggleColumnVisibility = (columnKey: keyof ColumnVisibility) => {
     setColumnVisibility(prev => ({
       ...prev,
       [columnKey]: !prev[columnKey]
     }));
   };
 
-  const renderTableCell = (columnKey: string, row: any) => {
+  const handleOpenClaimDetails = (row: any) => {
+    setSelectedClaim(row);
+    setIsModalOpen(true);
+  };
+
+  const renderTableCell = (columnKey: keyof ColumnVisibility, row: any) => {
     if (!columnVisibility[columnKey]) {
       return null;
     }
@@ -67,14 +95,27 @@ const AuditTable: React.FC<AuditTableProps> = ({
     let content = row[columnKey];
 
     if (columnKey === 'status') {
-      let badgeVariant = 'secondary';
+      let badgeVariant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "disabled" = "secondary";
+      
       if (content === 'Approved') {
-        badgeVariant = 'success';
+        badgeVariant = "success";
       } else if (content === 'Rejected') {
-        badgeVariant = 'destructive';
+        badgeVariant = "destructive";
       }
 
       content = <Badge variant={badgeVariant}>{content}</Badge>;
+    }
+
+    if (columnKey === 'claimNumber') {
+      content = (
+        <button 
+          className="text-blue-600 hover:underline flex items-center justify-center mx-auto"
+          onClick={() => handleOpenClaimDetails(row)}
+        >
+          <FileText className="h-3 w-3 mr-1" />
+          {row[columnKey]}
+        </button>
+      );
     }
 
     return <TableCell>{content}</TableCell>;
@@ -84,7 +125,10 @@ const AuditTable: React.FC<AuditTableProps> = ({
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-2">
         <h2 className="text-lg font-semibold">Audit Records</h2>
-        <ColumnVisibilityDropdown columnVisibility={columnVisibility} toggleColumnVisibility={toggleColumnVisibility} />
+        <ColumnVisibilityDropdown 
+          columnVisibility={columnVisibility as Record<string, boolean>} 
+          toggleColumnVisibility={toggleColumnVisibility}
+        />
       </div>
 
       <div className="flex-1 overflow-auto">
@@ -112,44 +156,40 @@ const AuditTable: React.FC<AuditTableProps> = ({
           </TableHeader>
           <TableBody>
             {loading ? (
-              <>
-                {Array.from({ length: pageSize }).map((_, i) => (
-                  <TableRow key={i}>
-                    {Object.keys(columnVisibility).filter(key => columnVisibility[key]).map((key, index) => (
-                      <TableCell key={index}>
-                        <Skeleton className="h-4 w-full" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </>
+              Array.from({ length: pageSize }).map((_, i) => (
+                <TableRow key={i}>
+                  {Object.keys(columnVisibility).filter(key => columnVisibility[key as keyof ColumnVisibility]).map((key, index) => (
+                    <TableCell key={index}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : data.length > 0 ? (
-              <>
-                {data.map((row) => (
-                  <TableRow key={row.id}>
-                    {renderTableCell('claimNumber', row)}
-                    {renderTableCell('claimDate', row)}
-                    {renderTableCell('hospitalName', row)}
-                    {renderTableCell('hospitalLocation', row)}
-                    {renderTableCell('htpaLocation', row)}
-                    {renderTableCell('dateOfAdmission', row)}
-                    {renderTableCell('dateOfDischarge', row)}
-                    {renderTableCell('fraudTriggers', row)}
-                    {renderTableCell('fieldInvestigationDate', row)}
-                    {renderTableCell('claimStatus', row)}
-                    {renderTableCell('status', row)}
-                    {renderTableCell('deskAuditReferralDate', row)}
-                    {renderTableCell('taTCompliance', row)}
-                    {renderTableCell('claimIntimationAging', row)}
-                    {renderTableCell('aiManualTrigger', row)}
-                    {renderTableCell('allocation', row)}
-                    {renderTableCell('fieldReport', row)}
-                  </TableRow>
-                ))}
-              </>
+              data.map((row) => (
+                <TableRow key={row.id}>
+                  {columnVisibility.claimNumber && renderTableCell('claimNumber', row)}
+                  {columnVisibility.claimDate && renderTableCell('claimDate', row)}
+                  {columnVisibility.hospitalName && renderTableCell('hospitalName', row)}
+                  {columnVisibility.hospitalLocation && renderTableCell('hospitalLocation', row)}
+                  {columnVisibility.htpaLocation && renderTableCell('htpaLocation', row)}
+                  {columnVisibility.dateOfAdmission && renderTableCell('dateOfAdmission', row)}
+                  {columnVisibility.dateOfDischarge && renderTableCell('dateOfDischarge', row)}
+                  {columnVisibility.fraudTriggers && renderTableCell('fraudTriggers', row)}
+                  {columnVisibility.fieldInvestigationDate && renderTableCell('fieldInvestigationDate', row)}
+                  {columnVisibility.claimStatus && renderTableCell('claimStatus', row)}
+                  {columnVisibility.status && renderTableCell('status', row)}
+                  {columnVisibility.deskAuditReferralDate && renderTableCell('deskAuditReferralDate', row)}
+                  {columnVisibility.taTCompliance && renderTableCell('taTCompliance', row)}
+                  {columnVisibility.claimIntimationAging && renderTableCell('claimIntimationAging', row)}
+                  {columnVisibility.aiManualTrigger && renderTableCell('aiManualTrigger', row)}
+                  {columnVisibility.allocation && renderTableCell('allocation', row)}
+                  {columnVisibility.fieldReport && renderTableCell('fieldReport', row)}
+                </TableRow>
+              ))
             ) : (
               <TableRow>
-                <TableCell colSpan={Object.keys(columnVisibility).length} className="text-center">No records found.</TableCell>
+                <TableCell colSpan={Object.keys(columnVisibility).filter(key => columnVisibility[key as keyof ColumnVisibility]).length} className="text-center">No records found.</TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -191,6 +231,14 @@ const AuditTable: React.FC<AuditTableProps> = ({
           </Button>
         </div>
       </div>
+
+      {selectedClaim && (
+        <ClaimDetailsModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          claimData={selectedClaim}
+        />
+      )}
     </div>
   );
 };

@@ -7,43 +7,19 @@ import Sidebar from '../components/Sidebar';
 import HeaderFilters from '../components/HeaderFilters';
 import AuditTable from '../components/AuditTable';
 import FilterPanel from '../components/FilterPanel';
-import { fetchDeskAudits, DeskAuditParams, DeskAuditItem } from '../services/api/auditService';
-import { fetchSubUsers } from '../services/api/userService';
-import { format } from 'date-fns';
+import { mockAuditData } from '../utils/mockData';
 
 interface DashboardParams {
   role: UserRole;
 }
 
-// Updated AuditData to match the DeskAuditItem interface structure from API
-interface AuditData {
-  id: string;
-  claimNumber: string;
-  claimDate: string;
-  hospitalName: string;
-  hospitalLocation: string;
-  htpaLocation: string;
-  dateOfAdmission: string;
-  dateOfDischarge: string;
-  fraudTriggers: string;
-  fieldInvestigationDate: string;
-  claimStatus: string;
-  status: string;
-  deskAuditReferralDate: string;
-  taTCompliance: string;
-  claimIntimationAging: string;
-  aiManualTrigger: string;
-  allocation?: string;
-  fieldReport: string;
-}
-
 const Dashboard: React.FC = () => {
   const { role } = useParams<{ role: string }>() as { role: UserRole };
   const { user, isAuthenticated } = useAuth();
-  const [data, setData] = useState<AuditData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(mockAuditData);
+  const [loading, setLoading] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [totalItems, setTotalItems] = useState(0);
+  const [totalItems, setTotalItems] = useState(mockAuditData.length);
   const [subUsers, setSubUsers] = useState<any[]>([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [pagination, setPagination] = useState({
@@ -55,74 +31,35 @@ const Dashboard: React.FC = () => {
     endDate: string;
     triggerType: string;
   }>({
-    startDate: '2023-01-01', // Default to 2023-01-01
-    endDate: '2024-01-01',   // Default to 2024-01-01
-    triggerType: 'Ai',       // Default trigger type
+    startDate: '2023-01-01', 
+    endDate: '2024-01-01',
+    triggerType: 'Ai',
   });
 
-  // Fetch sub-users based on role
+  // Mock fetch sub-users
   const fetchUsersByRole = async () => {
     if (role === 'ro_admin' || role === 'ho_admin') {
-      try {
-        const users = await fetchSubUsers();
-        setSubUsers(users);
-      } catch (error: any) {
-        toast.error(error.message || 'Failed to fetch users');
-      }
-    }
-  };
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      
-      const params: DeskAuditParams = {
-        start_date: filters.startDate,
-        end_date: filters.endDate,
-        page_no: pagination.page,
-        page_size: pagination.pageSize
-      };
-      
-      const response = await fetchDeskAudits(params);
-      
-      // Map API response to AuditData format
-      const mappedData: AuditData[] = response.data.map(item => ({
-        id: item.Id.toString(),
-        claimNumber: item.ClaimId,
-        claimDate: item.ClaimedDate,
-        hospitalName: item.HospitalId, // This might need to be fetched separately
-        hospitalLocation: '',
-        htpaLocation: item.HitpaLocation || '',
-        dateOfAdmission: item.DateOfAdmission,
-        dateOfDischarge: item.DateOfDischarge,
-        fraudTriggers: item.FraudTrigger,
-        fieldInvestigationDate: item.FraudInvestigationDate || '',
-        claimStatus: item.ClaimStatus || '',
-        status: item.ClaimStatus || 'Pending', // Using ClaimStatus or default to 'Pending'
-        deskAuditReferralDate: item.DeskAuditReferralDate || '',
-        taTCompliance: item.TatCompliance || '',
-        claimIntimationAging: item.ClaimIntimationAging || '',
-        aiManualTrigger: item.TriggerType,
-        allocation: '', // Will be populated from sub-users if needed
-        fieldReport: '' // Not available in API response
-      }));
-      
-      setData(mappedData);
-      setTotalItems(response.total_rec);
-      setLoading(false);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to fetch audit data');
-      setLoading(false);
-      setData([]);
+      const mockSubUsers = [
+        { id: 1, name: 'User 1', role: 'desk_auditor' },
+        { id: 2, name: 'User 2', role: 'desk_auditor' },
+        { id: 3, name: 'User 3', role: 'desk_auditor' }
+      ];
+      setSubUsers(mockSubUsers);
     }
   };
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData();
       fetchUsersByRole();
     }
-  }, [pagination.page, pagination.pageSize, isAuthenticated]);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    // Simulate pagination
+    const start = (pagination.page - 1) * pagination.pageSize;
+    const end = start + pagination.pageSize;
+    setData(mockAuditData.slice(start, end));
+  }, [pagination.page, pagination.pageSize]);
 
   useEffect(() => {
     // Listen for sidebar expansion/collapse
@@ -168,8 +105,20 @@ const Dashboard: React.FC = () => {
       page: 1
     }));
     
-    // Fetch data with updated filters
-    fetchData();
+    // Mock filtering - in a real app this would filter the data
+    setTimeout(() => {
+      // Filter by trigger type if applicable
+      let filtered = [...mockAuditData];
+      if (filters.triggerType && filters.triggerType !== 'All') {
+        filtered = filtered.filter(item => 
+          item.aiManualTrigger.toLowerCase() === filters.triggerType.toLowerCase()
+        );
+      }
+      
+      setData(filtered.slice(0, pagination.pageSize));
+      setTotalItems(filtered.length);
+      setLoading(false);
+    }, 500);
   };
 
   const handleExport = () => {
@@ -198,7 +147,8 @@ const Dashboard: React.FC = () => {
   const handleApplyAdvancedFilters = (advancedFilters: any) => {
     // Apply advanced filters here
     toast.success('Applied advanced filters');
-    // You would update the fetch params with these filters
+    setIsFilterPanelOpen(false);
+    // In a real app, you would update the fetch params with these filters
   };
 
   // Generate title based on role
