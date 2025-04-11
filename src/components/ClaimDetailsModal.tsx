@@ -18,6 +18,16 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Finding {
   id: string;
@@ -60,6 +70,7 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null);
   const [remarkText, setRemarkText] = useState("");
   const [openCombobox, setOpenCombobox] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
   const { toast } = useToast();
 
   const handleAddFinding = () => {
@@ -116,14 +127,14 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-auto p-0">
+        <DialogContent className="max-w-7xl w-full max-h-[90vh] overflow-auto p-0">
           <DialogHeader className="p-6 border-b bg-white sticky top-0 z-10">
-            <DialogTitle className="text-xl font-bold">Claim Details and Fraud Findings</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-center">Claim Details and Fraud Findings</DialogTitle>
           </DialogHeader>
           
           <div className="flex flex-col md:flex-row">
             {/* Left side - Document viewer placeholder */}
-            <div className="w-full md:w-1/2 p-6 bg-gray-100 min-h-[500px] flex items-center justify-center">
+            <div className="w-full md:w-1/2 p-6 bg-gray-100 min-h-[600px] flex items-center justify-center">
               <div className="text-gray-500 text-center">
                 <p className="font-medium text-lg">Document Viewer</p>
                 <p className="text-sm">Yet to be implemented</p>
@@ -131,13 +142,13 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
             </div>
             
             {/* Right side - Fraud findings */}
-            <div className="w-full md:w-1/2 p-6 bg-white">
-              <h3 className="text-lg font-bold mb-5">Fraud Findings</h3>
+            <div className="w-full md:w-1/2 p-8 bg-white">
+              <h3 className="text-lg font-bold mb-6">Fraud Findings</h3>
               
               <div className="border rounded-lg overflow-hidden shadow-sm">
                 {/* Table header */}
-                <div className="grid grid-cols-3 bg-blue-900 text-white py-3.5 px-4">
-                  <div className="col-span-1 font-medium">Finding</div>
+                <div className="grid grid-cols-3 bg-blue-900 text-white py-4 px-6">
+                  <div className="col-span-1 font-medium text-left">Finding</div>
                   <div className="col-span-1 font-medium text-center">Action</div>
                   <div className="col-span-1 font-medium text-center">Remarks</div>
                 </div>
@@ -145,13 +156,20 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                 {/* Table rows */}
                 <div className="max-h-[350px] overflow-y-auto">
                   {findings.map((finding) => (
-                    <div key={finding.id} className="grid grid-cols-3 border-t py-4 px-4 hover:bg-gray-50">
-                      <div className="col-span-1 flex items-center font-medium text-gray-700">{finding.description}</div>
-                      <div className="col-span-1 flex items-center justify-center gap-2">
+                    <div 
+                      key={finding.id} 
+                      className="grid grid-cols-3 border-t py-5 px-6 hover:bg-gray-50 items-center"
+                    >
+                      <div className="col-span-1 flex items-center font-medium text-gray-700 text-left">
+                        {finding.description}
+                      </div>
+                      <div className="col-span-1 flex items-center justify-center gap-3">
                         <Button 
                           size="sm"
                           variant={finding.status === 'accepted' ? 'success' : 'outline'}
-                          className="px-3 py-1.5 h-9 text-sm rounded-md shadow-sm"
+                          className={`px-5 py-1 h-9 text-sm rounded-md shadow-sm ${
+                            finding.status === 'accepted' ? 'bg-green-500 text-white' : ''
+                          }`}
                           onClick={() => updateFindingStatus(finding.id, 'accepted')}
                         >
                           <Check className="w-4 h-4 mr-1" />
@@ -160,7 +178,9 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                         <Button 
                           size="sm"
                           variant={finding.status === 'declined' ? 'destructive' : 'outline'}
-                          className="px-3 py-1.5 h-9 text-sm rounded-md shadow-sm"
+                          className={`px-5 py-1 h-9 text-sm rounded-md shadow-sm ${
+                            finding.status === 'declined' ? 'bg-red-500 text-white' : ''
+                          }`}
                           onClick={() => updateFindingStatus(finding.id, 'declined')}
                         >
                           <X className="w-4 h-4 mr-1" />
@@ -171,7 +191,7 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                         <Button 
                           size="sm"
                           variant="default"
-                          className="px-3 py-1.5 h-9 text-sm rounded-md shadow-sm"
+                          className="px-5 py-1 h-9 text-sm rounded-md shadow-sm bg-blue-500"
                           onClick={() => openRemarksSheet(finding.id)}
                         >
                           <MessageSquare className="w-4 h-4 mr-1" />
@@ -182,24 +202,24 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                   ))}
                 </div>
                 
-                {/* New finding dropdown row */}
-                <div className="grid grid-cols-3 border-t py-4 px-4 bg-gray-50 items-center">
-                  <div className="col-span-1">
+                {/* New finding input row */}
+                <div className="grid grid-cols-3 border-t py-5 px-6 bg-gray-50 items-center">
+                  <div className="col-span-2">
                     <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           role="combobox"
                           aria-expanded={openCombobox}
-                          className="w-full justify-between bg-white border-gray-300 text-gray-700 font-normal"
+                          className="w-full justify-between bg-white border-gray-300 text-gray-700 font-normal h-11"
                         >
-                          {selectedFinding || "Select finding..."}
+                          {selectedFinding || "Enter New Finding..."}
                           <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-full p-0">
                         <Command>
-                          <CommandInput placeholder="Search findings..." />
+                          <CommandInput placeholder="Search findings..." className="h-10" />
                           <CommandEmpty>No finding found.</CommandEmpty>
                           <CommandGroup className="max-h-[200px] overflow-auto">
                             {availableFindings.map((finding) => (
@@ -224,11 +244,11 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                       </PopoverContent>
                     </Popover>
                   </div>
-                  <div className="col-span-2 flex items-center ml-4">
+                  <div className="col-span-1 flex items-center justify-center">
                     <Button 
                       size="sm"
                       variant="default"
-                      className="bg-blue-500 hover:bg-blue-600 shadow-sm font-medium"
+                      className="bg-blue-100 hover:bg-blue-200 text-blue-800 shadow-sm font-medium w-32 h-10"
                       onClick={handleAddFinding}
                       disabled={!selectedFinding}
                     >
@@ -239,12 +259,12 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
               </div>
               
               {/* Footer button */}
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end mt-8">
                 <Button 
                   size="sm"
                   variant="outline"
                   onClick={onClose}
-                  className="px-5 py-2"
+                  className="px-6 py-2 h-10"
                 >
                   Close
                 </Button>
@@ -274,6 +294,27 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      {/* Alert Dialog for Remarks */}
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Add Remarks</AlertDialogTitle>
+            <AlertDialogDescription>
+              <Textarea 
+                placeholder="Enter your remarks here..."
+                className="min-h-[150px] mt-2 resize-none"
+                value={remarkText}
+                onChange={(e) => setRemarkText(e.target.value)}
+              />
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsAlertOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={saveRemarks}>Save</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
