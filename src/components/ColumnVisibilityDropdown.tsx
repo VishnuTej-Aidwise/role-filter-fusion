@@ -8,10 +8,11 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Columns } from 'lucide-react';
+import { ColumnVisibility } from './AuditTable';
 
 export interface ColumnVisibilityDropdownProps {
-  columnVisibility: Record<string, boolean>;
-  toggleColumnVisibility: (columnKey: string) => void;
+  columnVisibility: ColumnVisibility;
+  toggleColumnVisibility: (columnKey: keyof ColumnVisibility) => void;
 }
 
 const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({
@@ -51,8 +52,8 @@ const ColumnVisibilityDropdown: React.FC<ColumnVisibilityDropdownProps> = ({
         {Object.keys(columnVisibility).map((key) => (
           <DropdownMenuCheckboxItem
             key={key}
-            checked={columnVisibility[key]}
-            onCheckedChange={() => toggleColumnVisibility(key)}
+            checked={columnVisibility[key as keyof ColumnVisibility]}
+            onCheckedChange={() => toggleColumnVisibility(key as keyof ColumnVisibility)}
           >
             {columnDisplayName[key] || key}
           </DropdownMenuCheckboxItem>

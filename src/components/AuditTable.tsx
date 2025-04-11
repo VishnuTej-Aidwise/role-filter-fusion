@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -126,7 +127,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
       <div className="flex items-center justify-between px-4 py-2">
         <h2 className="text-lg font-semibold">Audit Records</h2>
         <ColumnVisibilityDropdown 
-          columnVisibility={columnVisibility as Record<string, boolean>} 
+          columnVisibility={columnVisibility} 
           toggleColumnVisibility={toggleColumnVisibility}
         />
       </div>
