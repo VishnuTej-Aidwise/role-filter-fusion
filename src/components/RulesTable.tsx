@@ -15,6 +15,15 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface RulesTableProps {
   data: RiskRule[];
@@ -74,6 +83,42 @@ const RulesTable: React.FC<RulesTableProps> = ({
     setConfirmDialogOpen(false);
   };
 
+  // Generate page numbers for pagination
+  const generatePageNumbers = () => {
+    const totalPages = Math.ceil(paginationProps.total / paginationProps.pageSize);
+    const currentPage = paginationProps.page;
+    const pages = [];
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range around current page
+    let startPage = Math.max(2, currentPage - 1);
+    let endPage = Math.min(totalPages - 1, currentPage + 1);
+    
+    // Add ellipsis after first page if needed
+    if (startPage > 2) {
+      pages.push('ellipsis1');
+    }
+    
+    // Add pages in range
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (endPage < totalPages - 1) {
+      pages.push('ellipsis2');
+    }
+    
+    // Add last page if it exists
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  };
+
   if (loading) {
     return <div className="flex justify-center items-center h-40">Loading...</div>;
   }
@@ -84,9 +129,9 @@ const RulesTable: React.FC<RulesTableProps> = ({
 
   return (
     <>
-      <div className="h-[calc(100vh-220px)]">
-        <ScrollArea className="h-full border rounded-md">
-          <div className="w-full">
+      <div className="h-[calc(100vh-180px)] w-full">
+        <ScrollArea className="h-full w-full">
+          <div className="w-full overflow-x-auto min-w-max">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -124,9 +169,15 @@ const RulesTable: React.FC<RulesTableProps> = ({
                     <TableCell className="text-xs py-1">{rule.category}</TableCell>
                     <TableCell className="text-xs py-1">{rule.subCategory}</TableCell>
                     <TableCell className="text-center py-1">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(rule.status)}`}>
-                        {rule.status}
-                      </span>
+                      <div className="flex items-center justify-center space-x-2">
+                        <Switch 
+                          checked={rule.status === 'Active'} 
+                          onCheckedChange={() => handleToggleStatus(rule.id)}
+                        />
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(rule.status)}`}>
+                          {rule.status}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className="text-center py-1">
                       <input 
@@ -154,7 +205,54 @@ const RulesTable: React.FC<RulesTableProps> = ({
         </ScrollArea>
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* Pagination */}
+      <div className="mt-4">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => paginationProps.page > 1 && paginationProps.onPageChange(paginationProps.page - 1)} 
+                className={paginationProps.page === 1 ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+            
+            {generatePageNumbers().map((pageNum, i) => {
+              if (pageNum === 'ellipsis1' || pageNum === 'ellipsis2') {
+                return (
+                  <PaginationItem key={`ellipsis-${i}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                );
+              }
+              
+              return (
+                <PaginationItem key={pageNum}>
+                  <PaginationLink 
+                    isActive={paginationProps.page === pageNum}
+                    onClick={() => paginationProps.onPageChange(Number(pageNum))}
+                  >
+                    {pageNum}
+                  </PaginationLink>
+                </PaginationItem>
+              );
+            })}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => {
+                  const totalPages = Math.ceil(paginationProps.total / paginationProps.pageSize);
+                  if (paginationProps.page < totalPages) {
+                    paginationProps.onPageChange(paginationProps.page + 1);
+                  }
+                }} 
+                className={paginationProps.page >= Math.ceil(paginationProps.total / paginationProps.pageSize) ? "pointer-events-none opacity-50" : ""}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+
+      {/* Status Toggle Confirmation Dialog */}
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <AlertDialogContent className="max-w-[350px]">
           <AlertDialogHeader>

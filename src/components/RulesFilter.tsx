@@ -45,12 +45,12 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-      <div>
-        <label className="block text-sm font-medium mb-2">Status</label>
+    <div className="flex flex-wrap items-end gap-4">
+      <div className="flex-1 min-w-[150px]">
+        <label className="block text-xs font-medium mb-1">Status</label>
         <Select onValueChange={(value) => handleChange('status', value)}>
-          <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select status" />
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
@@ -61,11 +61,11 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
         </Select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">Category</label>
+      <div className="flex-1 min-w-[150px]">
+        <label className="block text-xs font-medium mb-1">Category</label>
         <Select onValueChange={(value) => handleChange('category', value)}>
-          <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select Category" />
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
@@ -76,11 +76,11 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
         </Select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">Sub Category</label>
+      <div className="flex-1 min-w-[150px]">
+        <label className="block text-xs font-medium mb-1">Sub Category</label>
         <Select onValueChange={(value) => handleChange('subCategory', value)}>
-          <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select Sub Category" />
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Sub Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
@@ -91,11 +91,11 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
         </Select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">Trigger</label>
+      <div className="flex-1 min-w-[150px]">
+        <label className="block text-xs font-medium mb-1">Trigger</label>
         <Select onValueChange={(value) => handleChange('trigger', value)}>
-          <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select Trigger" />
+          <SelectTrigger className="h-8 text-xs">
+            <SelectValue placeholder="Trigger" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
@@ -106,12 +106,12 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
         </Select>
       </div>
 
-      <div className="md:col-span-4 flex justify-end space-x-3">
-        <Button onClick={handleFilter} className="bg-blue-500 hover:bg-blue-600">
-          <Search className="mr-2 h-4 w-4" /> Search
+      <div className="flex space-x-2">
+        <Button onClick={handleFilter} size="sm" className="h-8 text-xs">
+          <Search className="mr-1 h-3 w-3" /> Search
         </Button>
-        <Button onClick={handleReset} variant="secondary">
-          <RotateCcw className="mr-2 h-4 w-4" /> Reset
+        <Button onClick={handleReset} variant="secondary" size="sm" className="h-8 text-xs">
+          <RotateCcw className="mr-1 h-3 w-3" /> Reset
         </Button>
       </div>
     </div>

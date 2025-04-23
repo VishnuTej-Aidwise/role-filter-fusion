@@ -12,11 +12,32 @@ interface RiskManagementParams {
   role: UserRole;
 }
 
+// Create more mock data for pagination
+const generateMoreMockData = () => {
+  const additionalData: RiskRule[] = [];
+  const baseData = [...mockRiskRules];
+  
+  // Generate 90 more items for a total of ~100 items
+  for (let i = 0; i < 90; i++) {
+    const baseItem = baseData[i % baseData.length];
+    additionalData.push({
+      ...baseItem,
+      id: `extra-${i + 1}`,
+      name: `${baseItem.name} (Copy ${i + 1})`,
+      description: `${baseItem.description} - Additional item ${i + 1}`
+    });
+  }
+  
+  return [...baseData, ...additionalData];
+};
+
+const extendedMockData = generateMoreMockData();
+
 const RiskManagement: React.FC = () => {
   const { role } = useParams<{ role: string }>() as { role: UserRole };
   const { user, isAuthenticated } = useAuth();
-  const [data, setData] = useState(mockRiskRules);
-  const [filteredData, setFilteredData] = useState(mockRiskRules);
+  const [data, setData] = useState(extendedMockData);
+  const [filteredData, setFilteredData] = useState<RiskRule[]>([]);
   const [loading, setLoading] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [selectedRules, setSelectedRules] = useState<string[]>([]);
@@ -24,7 +45,7 @@ const RiskManagement: React.FC = () => {
     page: 1,
     pageSize: 10,
   });
-  const [totalItems, setTotalItems] = useState(mockRiskRules.length);
+  const [totalItems, setTotalItems] = useState(extendedMockData.length);
 
   // Listen for sidebar expansion/collapse
   useEffect(() => {
@@ -70,7 +91,7 @@ const RiskManagement: React.FC = () => {
     }));
     
     // Apply filters
-    let filtered = [...mockRiskRules];
+    let filtered = [...extendedMockData];
     
     if (filters.status && filters.status !== 'All') {
       filtered = filtered.filter(item => item.status === filters.status);
@@ -183,41 +204,41 @@ const RiskManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
       
       <div className={`flex-1 overflow-hidden transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
         <div className="p-4 h-full flex flex-col">
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <h1 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="bg-white rounded-lg shadow-sm p-3 mb-4">
+            <h1 className="text-base font-semibold text-gray-800 mb-3">
               Rules Management
             </h1>
             
             <RulesFilter onFilter={handleFilter} />
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm flex-1">
-            <div className="p-4">
-              <div className="flex justify-end space-x-2 mb-4">
+          <div className="bg-white rounded-lg shadow-sm flex-1 overflow-hidden">
+            <div className="p-3">
+              <div className="flex justify-end space-x-2 mb-3">
                 <button 
                   onClick={handleSetActive}
                   disabled={selectedRules.length === 0}
-                  className={`flex items-center px-3 py-1.5 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
+                  className={`flex items-center px-2 py-1 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
                 >
-                  <span className="mr-2">⚪</span> Set Active
+                  <span className="flex h-3 w-3 mr-1 bg-green-300 rounded-full"></span> Set Active
                 </button>
                 <button 
                   onClick={handleSetInactive}
                   disabled={selectedRules.length === 0}
-                  className={`flex items-center px-3 py-1.5 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed'}`}
+                  className={`flex items-center px-2 py-1 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed'}`}
                 >
-                  <span className="mr-2">⚫</span> Set Inactive
+                  <span className="flex h-3 w-3 mr-1 bg-red-300 rounded-full"></span> Set Inactive
                 </button>
                 <button 
                   onClick={handleExport}
-                  className="flex items-center px-3 py-1.5 rounded-md text-white bg-blue-500 hover:bg-blue-600 text-xs"
+                  className="flex items-center px-2 py-1 rounded-md text-white bg-blue-500 hover:bg-blue-600 text-xs"
                 >
-                  <span className="mr-2">↓</span> Export As
+                  <span className="mr-1">↓</span> Export As
                 </button>
               </div>
               
