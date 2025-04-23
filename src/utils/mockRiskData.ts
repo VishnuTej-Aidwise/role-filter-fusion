@@ -15,6 +15,13 @@ export interface RiskRule {
   version: string;
 }
 
+// Extract unique categories from the mock data
+export const categories = {
+  category1: ["Financial", "Validation", "Compliance"],
+  category2: ["Claims", "Provider"],
+  category3: ["Amount", "Duplicates", "Verification"]
+};
+
 export const mockRiskRules: RiskRule[] = [
   {
     id: "R001",
