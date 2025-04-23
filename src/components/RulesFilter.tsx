@@ -18,9 +18,9 @@ interface RulesFilterProps {
 const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
   const [filters, setFilters] = useState({
     status: '',
-    category1: '',
-    category2: '',
-    category3: '',
+    category: '',
+    subCategory: '',
+    trigger: '',
   });
 
   const handleChange = (field: string, value: string) => {
@@ -37,9 +37,9 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
   const handleReset = () => {
     setFilters({
       status: '',
-      category1: '',
-      category2: '',
-      category3: '',
+      category: '',
+      subCategory: '',
+      trigger: '',
     });
     onFilter({});
   };
@@ -56,19 +56,20 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
             <SelectItem value="All">All</SelectItem>
             <SelectItem value="Active">Active</SelectItem>
             <SelectItem value="Inactive">Inactive</SelectItem>
+            <SelectItem value="Review">Review</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Category 1</label>
-        <Select onValueChange={(value) => handleChange('category1', value)}>
+        <label className="block text-sm font-medium mb-2">Category</label>
+        <Select onValueChange={(value) => handleChange('category', value)}>
           <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select Category 1" />
+            <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
-            {categories.category1.map(cat => (
+            {categories.category.map(cat => (
               <SelectItem key={cat} value={cat}>{cat}</SelectItem>
             ))}
           </SelectContent>
@@ -76,14 +77,14 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Category 2</label>
-        <Select onValueChange={(value) => handleChange('category2', value)}>
+        <label className="block text-sm font-medium mb-2">Sub Category</label>
+        <Select onValueChange={(value) => handleChange('subCategory', value)}>
           <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select Category 2" />
+            <SelectValue placeholder="Select Sub Category" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
-            {categories.category2.map(cat => (
+            {categories.subCategory.map(cat => (
               <SelectItem key={cat} value={cat}>{cat}</SelectItem>
             ))}
           </SelectContent>
@@ -91,14 +92,14 @@ const RulesFilter: React.FC<RulesFilterProps> = ({ onFilter }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Category 3</label>
-        <Select onValueChange={(value) => handleChange('category3', value)}>
+        <label className="block text-sm font-medium mb-2">Trigger</label>
+        <Select onValueChange={(value) => handleChange('trigger', value)}>
           <SelectTrigger className="h-10">
-            <SelectValue placeholder="Select Category 3" />
+            <SelectValue placeholder="Select Trigger" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All</SelectItem>
-            {categories.category3.map(cat => (
+            {categories.trigger.map(cat => (
               <SelectItem key={cat} value={cat}>{cat}</SelectItem>
             ))}
           </SelectContent>

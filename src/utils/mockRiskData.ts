@@ -13,7 +13,7 @@ export interface RiskRule {
   deactivationDate: string;
 }
 
-// Extract unique categories from the mock data
+// Export categories for filters
 export const categories = {
   category: ["Clinical", "Non-Clinical"],
   subCategory: ["Claims Related", "Policy Related", "Entity Related"],

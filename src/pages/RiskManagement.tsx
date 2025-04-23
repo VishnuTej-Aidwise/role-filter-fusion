@@ -73,20 +73,19 @@ const RiskManagement: React.FC = () => {
     let filtered = [...mockRiskRules];
     
     if (filters.status && filters.status !== 'All') {
-      const isActive = filters.status === 'Active';
-      filtered = filtered.filter(item => item.status === isActive);
+      filtered = filtered.filter(item => item.status === filters.status);
     }
     
-    if (filters.category1 && filters.category1 !== 'All') {
-      filtered = filtered.filter(item => item.category1 === filters.category1);
+    if (filters.category && filters.category !== 'All') {
+      filtered = filtered.filter(item => item.category === filters.category);
     }
     
-    if (filters.category2 && filters.category2 !== 'All') {
-      filtered = filtered.filter(item => item.category2 === filters.category2);
+    if (filters.subCategory && filters.subCategory !== 'All') {
+      filtered = filtered.filter(item => item.subCategory === filters.subCategory);
     }
     
-    if (filters.category3 && filters.category3 !== 'All') {
-      filtered = filtered.filter(item => item.category3 === filters.category3);
+    if (filters.trigger && filters.trigger !== 'All') {
+      filtered = filtered.filter(item => item.trigger === filters.trigger);
     }
     
     setData(filtered);
@@ -128,7 +127,7 @@ const RiskManagement: React.FC = () => {
     
     const updatedData = data.map(rule => 
       selectedRules.includes(rule.id) 
-        ? { ...rule, status: true } 
+        ? { ...rule, status: "Active" as const } 
         : rule
     );
     
@@ -145,7 +144,7 @@ const RiskManagement: React.FC = () => {
     
     const updatedData = data.map(rule => 
       selectedRules.includes(rule.id) 
-        ? { ...rule, status: false } 
+        ? { ...rule, status: "Inactive" as const } 
         : rule
     );
     
@@ -170,13 +169,14 @@ const RiskManagement: React.FC = () => {
     const ruleToUpdate = data.find(rule => rule.id === id);
     if (!ruleToUpdate) return;
 
-    // In a real app, you'd show a confirmation dialog here before updating
+    const newStatus = ruleToUpdate.status === "Active" ? "Inactive" : "Active";
+    
     const updatedData = data.map(rule =>
-      rule.id === id ? { ...rule, status: !rule.status } : rule
+      rule.id === id ? { ...rule, status: newStatus } : rule
     );
     
     setData(updatedData);
-    toast.success(`Rule "${ruleToUpdate.name}" status updated to ${!ruleToUpdate.status ? 'active' : 'inactive'}`);
+    toast.success(`Rule "${ruleToUpdate.name}" status updated to ${newStatus}`);
   };
 
   return (
