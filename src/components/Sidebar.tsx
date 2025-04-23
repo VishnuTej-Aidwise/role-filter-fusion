@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, FileText, Clock, Users, Settings, LogOut, ChevronLeft } from 'lucide-react';
+import { ChevronRight, FileText, Clock, Users, Settings, LogOut, ChevronLeft, ShieldAlert } from 'lucide-react';
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -91,6 +91,12 @@ const Sidebar: React.FC = () => {
               label="Dashboard"
             />
             <SidebarItem 
+              icon={<ShieldAlert size={18} />} 
+              href={`/risk-management/${role}`} 
+              isActive={isActive('risk-management')} 
+              label="Risk Management"
+            />
+            <SidebarItem 
               icon={<Clock size={18} />} 
               href={`/history/${role}`} 
               isActive={isActive('history')} 
@@ -125,6 +131,21 @@ const Sidebar: React.FC = () => {
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right">Dashboard</TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={`/risk-management/${role}`}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
+                      isActive('risk-management') ? "bg-blue-700" : "hover:bg-blue-700"
+                    )}
+                  >
+                    <ShieldAlert size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">Risk Management</TooltipContent>
               </Tooltip>
               
               <Tooltip>

@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import RiskManagement from "./pages/RiskManagement";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -26,6 +27,12 @@ const App = () => (
             <Route path="/dashboard/:role" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/risk-management/:role" element={
+              <ProtectedRoute>
+                <RiskManagement />
               </ProtectedRoute>
             } />
             
