@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { RiskRule } from '../utils/mockRiskData';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
@@ -18,7 +17,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -87,35 +85,19 @@ const RulesTable: React.FC<RulesTableProps> = ({
   const generatePageNumbers = () => {
     const totalPages = Math.ceil(paginationProps.total / paginationProps.pageSize);
     const currentPage = paginationProps.page;
-    const pages = [];
-    
-    // Always show first page
-    pages.push(1);
-    
-    // Calculate range around current page
-    let startPage = Math.max(2, currentPage - 1);
-    let endPage = Math.min(totalPages - 1, currentPage + 1);
-    
-    // Add ellipsis after first page if needed
-    if (startPage > 2) {
-      pages.push('ellipsis1');
+    let pages = [];
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - 1 && i <= currentPage + 1)
+      ) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...');
+      }
     }
-    
-    // Add pages in range
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    
-    // Add ellipsis before last page if needed
-    if (endPage < totalPages - 1) {
-      pages.push('ellipsis2');
-    }
-    
-    // Add last page if it exists
-    if (totalPages > 1) {
-      pages.push(totalPages);
-    }
-    
     return pages;
   };
 
@@ -129,74 +111,70 @@ const RulesTable: React.FC<RulesTableProps> = ({
 
   return (
     <>
-      <div className="h-[calc(100vh-180px)] w-full">
-        <ScrollArea className="h-full w-full">
-          <div className="w-full overflow-x-auto min-w-max">
+      <div className="h-[calc(100vh-240px)] w-full">
+        <ScrollArea className="h-full rounded-md border border-gray-200">
+          <div className="w-full min-w-max">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10 sticky top-0 bg-blue-500 text-white text-xs">
+                <TableRow className="bg-blue-500">
+                  <TableHead className="w-10 text-center sticky left-0 bg-blue-500 text-white text-xs z-20">
                     <Checkbox 
                       checked={isAllSelected}
                       onCheckedChange={(checked) => onSelectAll(!!checked)}
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
                     />
                   </TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Trigger</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Rule Name</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Rule Description</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Category</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Sub Category</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Status</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Rule Start Date</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Rule End Date</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Activation Date</TableHead>
-                  <TableHead className="sticky top-0 bg-blue-500 text-white text-xs">Deactivation Date</TableHead>
+                  <TableHead className="text-white text-xs min-w-[120px]">Trigger</TableHead>
+                  <TableHead className="text-white text-xs min-w-[150px]">Rule Name</TableHead>
+                  <TableHead className="text-white text-xs min-w-[250px]">Rule Description</TableHead>
+                  <TableHead className="text-white text-xs min-w-[120px]">Category</TableHead>
+                  <TableHead className="text-white text-xs min-w-[150px]">Sub Category</TableHead>
+                  <TableHead className="text-white text-xs min-w-[100px] text-center">Status</TableHead>
+                  <TableHead className="text-white text-xs min-w-[150px]">Rule Start Date</TableHead>
+                  <TableHead className="text-white text-xs min-w-[150px]">Rule End Date</TableHead>
+                  <TableHead className="text-white text-xs min-w-[150px]">Activation Date</TableHead>
+                  <TableHead className="text-white text-xs min-w-[150px]">Deactivation Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.map((rule) => (
                   <TableRow key={rule.id} className="hover:bg-gray-50">
-                    <TableCell className="text-center py-1">
+                    <TableCell className="sticky left-0 bg-white z-10 text-center">
                       <Checkbox 
                         checked={selectedRules.includes(rule.id)}
                         onCheckedChange={(checked) => onRuleSelection(rule.id, !!checked)}
                       />
                     </TableCell>
-                    <TableCell className="text-xs py-1">{rule.trigger}</TableCell>
-                    <TableCell className="text-xs py-1">{rule.name}</TableCell>
-                    <TableCell className="text-xs py-1">{rule.description}</TableCell>
-                    <TableCell className="text-xs py-1">{rule.category}</TableCell>
-                    <TableCell className="text-xs py-1">{rule.subCategory}</TableCell>
-                    <TableCell className="text-center py-1">
-                      <div className="flex items-center justify-center space-x-2">
-                        <Switch 
-                          checked={rule.status === 'Active'} 
-                          onCheckedChange={() => handleToggleStatus(rule.id)}
-                        />
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(rule.status)}`}>
-                          {rule.status}
-                        </span>
-                      </div>
+                    <TableCell className="text-xs">{rule.trigger}</TableCell>
+                    <TableCell className="text-xs font-medium">{rule.name}</TableCell>
+                    <TableCell className="text-xs">{rule.description}</TableCell>
+                    <TableCell className="text-xs">{rule.category}</TableCell>
+                    <TableCell className="text-xs">{rule.subCategory}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch 
+                        checked={rule.status === 'Active'} 
+                        onCheckedChange={() => handleToggleStatus(rule.id)}
+                        className="data-[state=checked]:bg-green-500"
+                      />
                     </TableCell>
-                    <TableCell className="text-center py-1">
+                    <TableCell className="text-center">
                       <input 
                         type="date" 
-                        className="border rounded px-1 py-0.5 text-xs w-28"
+                        className="border rounded px-2 py-1 text-xs w-32"
                         value={rule.ruleStartDate}
                         onChange={(e) => onDateChange(rule.id, 'ruleStartDate', e.target.value)}
                       />
                     </TableCell>
-                    <TableCell className="text-center py-1">
+                    <TableCell className="text-center">
                       <input 
                         type="date" 
-                        className="border rounded px-1 py-0.5 text-xs w-28"
+                        className="border rounded px-2 py-1 text-xs w-32"
                         value={rule.ruleEndDate}
                         onChange={(e) => onDateChange(rule.id, 'ruleEndDate', e.target.value)}
                       />
                     </TableCell>
-                    <TableCell className="text-xs py-1">{rule.activationDate}</TableCell>
-                    <TableCell className="text-xs py-1">{rule.deactivationDate}</TableCell>
+                    <TableCell className="text-xs">{rule.activationDate}</TableCell>
+                    <TableCell className="text-xs">{rule.deactivationDate}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -206,36 +184,30 @@ const RulesTable: React.FC<RulesTableProps> = ({
       </div>
 
       {/* Pagination */}
-      <div className="mt-4">
+      <div className="mt-4 flex justify-center">
         <Pagination>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious 
-                onClick={() => paginationProps.page > 1 && paginationProps.onPageChange(paginationProps.page - 1)} 
+                onClick={() => paginationProps.page > 1 && paginationProps.onPageChange(paginationProps.page - 1)}
                 className={paginationProps.page === 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
             
-            {generatePageNumbers().map((pageNum, i) => {
-              if (pageNum === 'ellipsis1' || pageNum === 'ellipsis2') {
-                return (
-                  <PaginationItem key={`ellipsis-${i}`}>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                );
-              }
-              
-              return (
-                <PaginationItem key={pageNum}>
-                  <PaginationLink 
-                    isActive={paginationProps.page === pageNum}
+            {generatePageNumbers().map((pageNum, i) => (
+              <PaginationItem key={i}>
+                {pageNum === '...' ? (
+                  <span className="px-3 py-2">...</span>
+                ) : (
+                  <PaginationLink
                     onClick={() => paginationProps.onPageChange(Number(pageNum))}
+                    isActive={paginationProps.page === pageNum}
                   >
                     {pageNum}
                   </PaginationLink>
-                </PaginationItem>
-              );
-            })}
+                )}
+              </PaginationItem>
+            ))}
             
             <PaginationItem>
               <PaginationNext 
@@ -244,7 +216,7 @@ const RulesTable: React.FC<RulesTableProps> = ({
                   if (paginationProps.page < totalPages) {
                     paginationProps.onPageChange(paginationProps.page + 1);
                   }
-                }} 
+                }}
                 className={paginationProps.page >= Math.ceil(paginationProps.total / paginationProps.pageSize) ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
@@ -254,16 +226,16 @@ const RulesTable: React.FC<RulesTableProps> = ({
 
       {/* Status Toggle Confirmation Dialog */}
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <AlertDialogContent className="max-w-[350px]">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-sm">Confirm Status Change</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs">
+            <AlertDialogTitle>Confirm Status Change</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to change the status of this rule?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-xs h-8">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmToggleStatus} className="text-xs h-8">Confirm</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmToggleStatus}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
