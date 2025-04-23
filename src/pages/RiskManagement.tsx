@@ -186,33 +186,33 @@ const RiskManagement: React.FC = () => {
       <div className={`flex-1 overflow-hidden transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
         <div className="p-4 h-full flex flex-col">
           <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <h1 className="text-xl font-bold text-gray-800 mb-4">
+            <h1 className="text-lg font-semibold text-gray-800 mb-4">
               Rules Management
             </h1>
             
             <RulesFilter onFilter={handleFilter} />
           </div>
           
-          <div className="bg-white rounded-lg shadow-sm flex-1 overflow-hidden flex flex-col">
+          <div className="bg-white rounded-lg shadow-sm flex-1">
             <div className="p-4">
               <div className="flex justify-end space-x-2 mb-4">
                 <button 
                   onClick={handleSetActive}
                   disabled={selectedRules.length === 0}
-                  className={`flex items-center px-4 py-2 rounded-md text-white ${selectedRules.length > 0 ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-300 cursor-not-allowed'}`}
+                  className={`flex items-center px-3 py-1.5 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
                 >
                   <span className="mr-2">⚪</span> Set Active
                 </button>
                 <button 
                   onClick={handleSetInactive}
                   disabled={selectedRules.length === 0}
-                  className={`flex items-center px-4 py-2 rounded-md text-white ${selectedRules.length > 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-red-300 cursor-not-allowed'}`}
+                  className={`flex items-center px-3 py-1.5 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed'}`}
                 >
                   <span className="mr-2">⚫</span> Set Inactive
                 </button>
                 <button 
                   onClick={handleExport}
-                  className="flex items-center px-4 py-2 rounded-md text-white bg-blue-500 hover:bg-blue-600"
+                  className="flex items-center px-3 py-1.5 rounded-md text-white bg-blue-500 hover:bg-blue-600 text-xs"
                 >
                   <span className="mr-2">↓</span> Export As
                 </button>
