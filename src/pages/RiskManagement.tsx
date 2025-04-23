@@ -6,7 +6,7 @@ import { useAuth, UserRole } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import RulesTable from '../components/RulesTable';
 import RulesFilter from '../components/RulesFilter';
-import { mockRiskRules, RiskRule } from '../utils/mockRiskData';
+import { mockRiskRules, RiskRule, categories } from '../utils/mockRiskData';
 
 interface RiskManagementParams {
   role: UserRole;
@@ -125,6 +125,7 @@ const RiskManagement: React.FC = () => {
       return;
     }
     
+    // Fix: Use proper type for status
     const updatedData = data.map(rule => 
       selectedRules.includes(rule.id) 
         ? { ...rule, status: "Active" as const } 
@@ -142,6 +143,7 @@ const RiskManagement: React.FC = () => {
       return;
     }
     
+    // Fix: Use proper type for status
     const updatedData = data.map(rule => 
       selectedRules.includes(rule.id) 
         ? { ...rule, status: "Inactive" as const } 
@@ -169,7 +171,8 @@ const RiskManagement: React.FC = () => {
     const ruleToUpdate = data.find(rule => rule.id === id);
     if (!ruleToUpdate) return;
 
-    const newStatus = ruleToUpdate.status === "Active" ? "Inactive" : "Active";
+    // Fix: Use proper type for status
+    const newStatus: "Active" | "Inactive" | "Review" = ruleToUpdate.status === "Active" ? "Inactive" : "Active";
     
     const updatedData = data.map(rule =>
       rule.id === id ? { ...rule, status: newStatus } : rule
