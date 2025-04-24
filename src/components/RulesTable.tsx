@@ -109,9 +109,9 @@ const RulesTable: React.FC<RulesTableProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-[calc(100vh-12rem)]">
       <div className="flex-1 min-h-0">
-        <ScrollArea className="h-[calc(100vh-320px)] rounded-md border border-gray-200">
+        <ScrollArea className="h-full rounded-md border border-gray-200">
           <div className="w-full min-w-[1200px]">
             <Table>
               <TableHeader>
