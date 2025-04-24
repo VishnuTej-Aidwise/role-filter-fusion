@@ -81,7 +81,6 @@ const RulesTable: React.FC<RulesTableProps> = ({
     setConfirmDialogOpen(false);
   };
 
-  // Generate page numbers for pagination
   const generatePageNumbers = () => {
     const totalPages = Math.ceil(paginationProps.total / paginationProps.pageSize);
     const currentPage = paginationProps.page;
@@ -110,13 +109,13 @@ const RulesTable: React.FC<RulesTableProps> = ({
   }
 
   return (
-    <>
-      <div className="h-[calc(100vh-240px)] w-full">
-        <ScrollArea className="h-full rounded-md border border-gray-200">
-          <div className="w-full min-w-max">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 min-h-0">
+        <ScrollArea className="h-[calc(100vh-320px)] rounded-md border border-gray-200">
+          <div className="w-full min-w-[1200px]">
             <Table>
               <TableHeader>
-                <TableRow className="bg-blue-500">
+                <TableRow className="bg-blue-500 sticky top-0 z-10">
                   <TableHead className="w-10 text-center sticky left-0 bg-blue-500 text-white text-xs z-20">
                     <Checkbox 
                       checked={isAllSelected}
@@ -124,16 +123,16 @@ const RulesTable: React.FC<RulesTableProps> = ({
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
                     />
                   </TableHead>
-                  <TableHead className="text-white text-xs min-w-[120px]">Trigger</TableHead>
-                  <TableHead className="text-white text-xs min-w-[150px]">Rule Name</TableHead>
-                  <TableHead className="text-white text-xs min-w-[250px]">Rule Description</TableHead>
-                  <TableHead className="text-white text-xs min-w-[120px]">Category</TableHead>
-                  <TableHead className="text-white text-xs min-w-[150px]">Sub Category</TableHead>
-                  <TableHead className="text-white text-xs min-w-[100px] text-center">Status</TableHead>
-                  <TableHead className="text-white text-xs min-w-[150px]">Rule Start Date</TableHead>
-                  <TableHead className="text-white text-xs min-w-[150px]">Rule End Date</TableHead>
-                  <TableHead className="text-white text-xs min-w-[150px]">Activation Date</TableHead>
-                  <TableHead className="text-white text-xs min-w-[150px]">Deactivation Date</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[120px]">Trigger</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[150px]">Rule Name</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[250px]">Rule Description</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[120px]">Category</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[150px]">Sub Category</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[100px] text-center">Status</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[150px]">Rule Start Date</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[150px]">Rule End Date</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[150px]">Activation Date</TableHead>
+                  <TableHead className="text-white text-xs font-semibold min-w-[150px]">Deactivation Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -183,8 +182,7 @@ const RulesTable: React.FC<RulesTableProps> = ({
         </ScrollArea>
       </div>
 
-      {/* Pagination */}
-      <div className="mt-4 flex justify-center">
+      <div className="mt-4 border-t pt-4 bg-white">
         <Pagination>
           <PaginationContent>
             <PaginationItem>
@@ -224,7 +222,6 @@ const RulesTable: React.FC<RulesTableProps> = ({
         </Pagination>
       </div>
 
-      {/* Status Toggle Confirmation Dialog */}
       <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -239,7 +236,7 @@ const RulesTable: React.FC<RulesTableProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 };
 

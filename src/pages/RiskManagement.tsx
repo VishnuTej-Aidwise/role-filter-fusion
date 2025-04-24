@@ -208,57 +208,57 @@ const RiskManagement: React.FC = () => {
       <Sidebar />
       
       <div className={`flex-1 overflow-hidden transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
-        <div className="p-4 h-full flex flex-col">
-          <div className="bg-white rounded-lg shadow-sm p-3 mb-4">
-            <h1 className="text-base font-semibold text-gray-800 mb-3">
-              Rules Management
-            </h1>
+        <div className="p-6 h-full flex flex-col">
+          <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-lg font-semibold text-gray-800">
+                Rules Management
+              </h1>
+              
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleSetActive}
+                  disabled={selectedRules.length === 0}
+                  className={`flex items-center px-3 py-1.5 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
+                >
+                  <span className="flex h-2 w-2 mr-1.5 bg-green-300 rounded-full"></span> Set Active
+                </button>
+                <button 
+                  onClick={handleSetInactive}
+                  disabled={selectedRules.length === 0}
+                  className={`flex items-center px-3 py-1.5 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed'}`}
+                >
+                  <span className="flex h-2 w-2 mr-1.5 bg-red-300 rounded-full"></span> Set Inactive
+                </button>
+                <button 
+                  onClick={handleExport}
+                  className="flex items-center px-3 py-1.5 rounded-md text-white bg-blue-500 hover:bg-blue-600 text-xs"
+                >
+                  <span className="mr-1.5">↓</span> Export As
+                </button>
+              </div>
+            </div>
             
             <RulesFilter onFilter={handleFilter} />
           </div>
           
           <div className="bg-white rounded-lg shadow-sm flex-1 overflow-hidden">
-            <div className="p-3">
-              <div className="flex justify-end space-x-2 mb-3">
-                <button 
-                  onClick={handleSetActive}
-                  disabled={selectedRules.length === 0}
-                  className={`flex items-center px-2 py-1 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
-                >
-                  <span className="flex h-3 w-3 mr-1 bg-green-300 rounded-full"></span> Set Active
-                </button>
-                <button 
-                  onClick={handleSetInactive}
-                  disabled={selectedRules.length === 0}
-                  className={`flex items-center px-2 py-1 rounded-md text-white text-xs ${selectedRules.length > 0 ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed'}`}
-                >
-                  <span className="flex h-3 w-3 mr-1 bg-red-300 rounded-full"></span> Set Inactive
-                </button>
-                <button 
-                  onClick={handleExport}
-                  className="flex items-center px-2 py-1 rounded-md text-white bg-blue-500 hover:bg-blue-600 text-xs"
-                >
-                  <span className="mr-1">↓</span> Export As
-                </button>
-              </div>
-              
-              <RulesTable 
-                data={filteredData}
-                loading={loading}
-                selectedRules={selectedRules}
-                onRuleSelection={handleRuleSelection}
-                onSelectAll={handleSelectAll}
-                onStatusToggle={handleStatusToggle}
-                onDateChange={handleDateChange}
-                paginationProps={{
-                  page: pagination.page,
-                  pageSize: pagination.pageSize,
-                  total: totalItems,
-                  onPageChange: handlePageChange,
-                  onPageSizeChange: handlePageSizeChange
-                }}
-              />
-            </div>
+            <RulesTable 
+              data={filteredData}
+              loading={loading}
+              selectedRules={selectedRules}
+              onRuleSelection={handleRuleSelection}
+              onSelectAll={handleSelectAll}
+              onStatusToggle={handleStatusToggle}
+              onDateChange={handleDateChange}
+              paginationProps={{
+                page: pagination.page,
+                pageSize: pagination.pageSize,
+                total: totalItems,
+                onPageChange: handlePageChange,
+                onPageSizeChange: handlePageSizeChange
+              }}
+            />
           </div>
         </div>
       </div>
