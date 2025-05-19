@@ -39,7 +39,11 @@ interface Rule {
 
 interface HistoryItem {
   name: string;
-  weight: number;
+  features: {
+    name: string;
+    weight: number;
+    rules?: { name: string; weight: number }[];
+  }[];
 }
 
 const RiskConfiguration: React.FC = () => {
@@ -146,12 +150,49 @@ const RiskConfiguration: React.FC = () => {
     { id: 'rule-31', name: 'Cross-Reference Error', enabled: true, weight: 25, featureId: 'data-verification' }
   ]);
 
-  // Mock history data
-  const [historyItems] = useState<HistoryItem[]>([
-    { name: 'Meta Data Analytics', weight: 25 },
-    { name: 'Stamp Data Analytics', weight: 25 },
-    { name: 'Tampering Analytics', weight: 25 },
-    { name: 'Data Verification', weight: 25 }
+  // Updated structure for history items to display feature data with rules
+  const [historyItems] = useState<{
+    name: string;
+    features: {
+      name: string;
+      weight: number;
+      rules?: { name: string; weight: number }[];
+    }[];
+  }[]>([
+    { 
+      name: "Default",
+      features: [
+        { 
+          name: "Meta Data Analytics", 
+          weight: 25,
+        },
+        { 
+          name: "Stamp Data Analytics", 
+          weight: 25,
+          rules: [
+            { name: "All stamp without sign", weight: 5 },
+            { name: "Some stamp without sign", weight: 5 },
+            { name: "No Stamp Present", weight: 40 },
+            { name: "No Signature", weight: 45 },
+            { name: "No Embossing", weight: 5 },
+          ]
+        },
+        { 
+          name: "Tampering Analytics", 
+          weight: 25,
+          rules: [
+            { name: "Digital Overlapping", weight: 5 },
+            { name: "Font Anomaly", weight: 45 },
+            { name: "Text Distortion", weight: 25 },
+            { name: "Image Alteration", weight: 25 },
+          ]
+        },
+        { 
+          name: "Data Verification", 
+          weight: 25,
+        }
+      ]
+    }
   ]);
 
   // Listen for sidebar expansion/collapse
@@ -338,28 +379,49 @@ const RiskConfiguration: React.FC = () => {
                   <CardTitle className="text-base font-medium">History</CardTitle>
                 </CardHeader>
                 <CardContent className="px-0 pt-0">
-                  <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="default-history" className="border-b-0">
-                      <AccordionTrigger className="py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 font-medium text-sm">
-                        Default
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="space-y-1 mt-2">
-                          {historyItems.map((item, index) => (
-                            <div key={index} className="bg-gray-50 rounded-md p-3">
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                  <ChevronDown className="h-4 w-4 text-gray-500" />
-                                  <span className="text-sm font-medium">{item.name}</span>
+                  {historyItems.map((history, historyIndex) => (
+                    <div key={historyIndex} className="mb-4">
+                      <h3 className="py-2 px-3 bg-gray-50 rounded-md font-medium text-sm">
+                        {history.name}
+                      </h3>
+                      <div className="space-y-1 mt-2">
+                        {history.features.map((feature, featureIndex) => (
+                          <Accordion 
+                            key={featureIndex} 
+                            type="single" 
+                            collapsible 
+                            className="border-0"
+                          >
+                            <AccordionItem value={`feature-${featureIndex}`} className="border-b-0 mb-1">
+                              <AccordionTrigger className="py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 text-sm">
+                                <div className="flex justify-between items-center w-full pr-2">
+                                  <span>{feature.name}</span>
+                                  <span>{feature.weight}</span>
                                 </div>
-                                <span className="text-sm">{item.weight}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                              </AccordionTrigger>
+                              {feature.rules && (
+                                <AccordionContent>
+                                  <div className="space-y-1 mt-1 ml-5">
+                                    {feature.rules.map((rule, ruleIndex) => (
+                                      <div 
+                                        key={ruleIndex} 
+                                        className="bg-gray-50 rounded-md p-2"
+                                      >
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-xs">{rule.name}</span>
+                                          <span className="text-xs">{rule.weight}</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </AccordionContent>
+                              )}
+                            </AccordionItem>
+                          </Accordion>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
             </div>
