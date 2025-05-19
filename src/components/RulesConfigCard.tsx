@@ -1,0 +1,56 @@
+
+import React from 'react';
+import { Switch } from "@/components/ui/switch";
+
+interface Rule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  weight: number;
+  featureId: string;
+}
+
+interface RulesConfigCardProps {
+  rule: Rule;
+  onToggle: (id: string) => void;
+  onWeightChange: (id: string, weight: number) => void;
+}
+
+const RulesConfigCard: React.FC<RulesConfigCardProps> = ({
+  rule,
+  onToggle,
+  onWeightChange,
+}) => {
+  return (
+    <div className="border rounded-md p-3 grid grid-cols-12 items-center gap-4 hover:bg-gray-50">
+      <div className="col-span-1">
+        <Switch
+          checked={rule.enabled}
+          onCheckedChange={() => onToggle(rule.id)}
+          className={`data-[state=checked]:bg-orange-500`}
+        />
+      </div>
+      
+      <div className="col-span-7 font-medium">
+        {rule.name}
+      </div>
+      
+      <div className="col-span-4">
+        <input
+          type="number"
+          className="w-full rounded border-gray-300 px-3 py-1 text-right"
+          value={rule.weight}
+          onChange={(e) => {
+            const value = parseInt(e.target.value) || 0;
+            onWeightChange(rule.id, value);
+          }}
+          disabled={!rule.enabled}
+          min="0"
+          max="100"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default RulesConfigCard;

@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import RiskManagement from "./pages/RiskManagement";
+import RiskConfiguration from "./pages/RiskConfiguration";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -33,6 +34,12 @@ const App = () => (
             <Route path="/risk-management/:role" element={
               <ProtectedRoute>
                 <RiskManagement />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/risk-configuration/:role" element={
+              <ProtectedRoute>
+                <RiskConfiguration />
               </ProtectedRoute>
             } />
             
