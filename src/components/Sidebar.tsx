@@ -113,23 +113,15 @@ const Sidebar: React.FC = () => {
             <SidebarItem 
               icon={<ShieldAlert size={18} />} 
               href={`/risk-management/${role}`} 
-              isActive={isActive('risk-management') || isActive('risk-configuration')} 
+              isActive={isActive('risk-management') && !isActive('risk-configuration')} 
               label="Risk Management"
             />
-            {(isActive('risk-management') || isActive('risk-configuration')) && (
-              <>
-                <SidebarSubItem 
-                  href={`/risk-management/${role}`}
-                  isActive={isActive('risk-management') && !isActive('risk-configuration')}
-                  label="Risk Rules"
-                />
-                <SidebarSubItem 
-                  href={`/risk-configuration/${role}`}
-                  isActive={isActive('risk-configuration')}
-                  label="Risk Configuration"
-                />
-              </>
-            )}
+            <SidebarItem 
+              icon={<Sliders size={18} />} 
+              href={`/risk-configuration/${role}`}
+              isActive={isActive('risk-configuration')}
+              label="Risk Configuration"
+            />
             <SidebarItem 
               icon={<Clock size={18} />} 
               href={`/history/${role}`} 
@@ -173,7 +165,7 @@ const Sidebar: React.FC = () => {
                     to={`/risk-management/${role}`}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
-                      isActive('risk-management') || isActive('risk-configuration') ? "bg-blue-700" : "hover:bg-blue-700"
+                      isActive('risk-management') && !isActive('risk-configuration') ? "bg-blue-700" : "hover:bg-blue-700"
                     )}
                   >
                     <ShieldAlert size={20} />
@@ -182,24 +174,20 @@ const Sidebar: React.FC = () => {
                 <TooltipContent side="right">Risk Management</TooltipContent>
               </Tooltip>
               
-              {(isActive('risk-management') || isActive('risk-configuration')) && (
-                <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        to={`/risk-configuration/${role}`}
-                        className={cn(
-                          "w-8 h-8 flex items-center justify-center text-white rounded-md ml-4 my-1",
-                          isActive('risk-configuration') ? "bg-blue-800" : "hover:bg-blue-800"
-                        )}
-                      >
-                        <Sliders size={16} />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Risk Configuration</TooltipContent>
-                  </Tooltip>
-                </>
-              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to={`/risk-configuration/${role}`}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
+                      isActive('risk-configuration') ? "bg-blue-700" : "hover:bg-blue-700"
+                    )}
+                  >
+                    <Sliders size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">Risk Configuration</TooltipContent>
+              </Tooltip>
               
               <Tooltip>
                 <TooltipTrigger asChild>

@@ -22,16 +22,16 @@ const RulesConfigCard: React.FC<RulesConfigCardProps> = ({
   onWeightChange,
 }) => {
   return (
-    <div className="border rounded-md p-2 grid grid-cols-12 items-center gap-3 hover:bg-gray-50">
-      <div className="col-span-1">
+    <div className="border rounded-md p-3 grid grid-cols-12 items-center gap-2 hover:bg-gray-50">
+      <div className="col-span-1 flex items-center justify-center">
         <Switch
           checked={rule.enabled}
           onCheckedChange={() => onToggle(rule.id)}
-          className="data-[state=checked]:bg-orange-500 scale-85"
+          className="data-[state=checked]:bg-orange-500"
         />
       </div>
       
-      <div className="col-span-7 text-sm font-medium">
+      <div className="col-span-7 text-sm font-medium pl-1">
         {rule.name}
       </div>
       

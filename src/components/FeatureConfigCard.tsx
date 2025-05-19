@@ -27,20 +27,20 @@ const FeatureConfigCard: React.FC<FeatureConfigCardProps> = ({
 }) => {
   return (
     <div 
-      className={`border rounded-md p-2 grid grid-cols-12 items-center gap-3 cursor-pointer transition-all
+      className={`border rounded-md p-3 grid grid-cols-12 items-center gap-2 cursor-pointer transition-all
                 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}
       onClick={() => onSelect(feature.id)}
     >
-      <div className="col-span-1">
+      <div className="col-span-1 flex items-center justify-center">
         <Switch
           checked={feature.enabled}
           onCheckedChange={() => onToggle(feature.id)}
-          className="data-[state=checked]:bg-orange-500 scale-85"
+          className="data-[state=checked]:bg-orange-500"
           onClick={(e) => e.stopPropagation()}
         />
       </div>
       
-      <div className="col-span-7 text-sm font-medium">
+      <div className="col-span-7 text-sm font-medium pl-1">
         {feature.name}
       </div>
       
