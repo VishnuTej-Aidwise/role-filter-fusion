@@ -27,7 +27,7 @@ const FeatureConfigCard: React.FC<FeatureConfigCardProps> = ({
 }) => {
   return (
     <div 
-      className={`border rounded-md p-3 grid grid-cols-12 items-center gap-2 cursor-pointer transition-all
+      className={`border rounded-md p-2.5 grid grid-cols-12 items-center gap-3 cursor-pointer transition-all
                 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}
       onClick={() => onSelect(feature.id)}
     >

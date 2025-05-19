@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { toast } from "sonner";
@@ -7,7 +6,14 @@ import Sidebar from '../components/Sidebar';
 import FeatureConfigCard from '../components/FeatureConfigCard';
 import RulesConfigCard from '../components/RulesConfigCard';
 import { Button } from '../components/ui/button';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Save } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { 
+  Accordion, 
+  AccordionContent, 
+  AccordionItem, 
+  AccordionTrigger 
+} from '../components/ui/accordion';
 
 interface RiskConfigurationParams {
   role: UserRole;
@@ -29,6 +35,11 @@ interface Rule {
   enabled: boolean;
   weight: number;
   featureId: string;
+}
+
+interface HistoryItem {
+  name: string;
+  weight: number;
 }
 
 const RiskConfiguration: React.FC = () => {
@@ -135,6 +146,14 @@ const RiskConfiguration: React.FC = () => {
     { id: 'rule-31', name: 'Cross-Reference Error', enabled: true, weight: 25, featureId: 'data-verification' }
   ]);
 
+  // Mock history data
+  const [historyItems] = useState<HistoryItem[]>([
+    { name: 'Meta Data Analytics', weight: 25 },
+    { name: 'Stamp Data Analytics', weight: 25 },
+    { name: 'Tampering Analytics', weight: 25 },
+    { name: 'Data Verification', weight: 25 }
+  ]);
+
   // Listen for sidebar expansion/collapse
   useEffect(() => {
     const handleSidebarChange = () => {
@@ -239,7 +258,7 @@ const RiskConfiguration: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Features Section */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-base font-medium mb-3">Configuration Features</h2>
@@ -311,6 +330,39 @@ const RiskConfiguration: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* History Section */}
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <Card className="border-0 shadow-none">
+                <CardHeader className="px-0 pt-0 pb-2">
+                  <CardTitle className="text-base font-medium">History</CardTitle>
+                </CardHeader>
+                <CardContent className="px-0 pt-0">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="default-history" className="border-b-0">
+                      <AccordionTrigger className="py-2 px-3 bg-gray-50 rounded-md hover:bg-gray-100 font-medium text-sm">
+                        Default
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-1 mt-2">
+                          {historyItems.map((item, index) => (
+                            <div key={index} className="bg-gray-50 rounded-md p-3">
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm font-medium">{item.name}</span>
+                                </div>
+                                <span className="text-sm">{item.weight}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
