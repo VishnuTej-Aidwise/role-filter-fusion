@@ -27,7 +27,7 @@ const FeatureConfigCard: React.FC<FeatureConfigCardProps> = ({
 }) => {
   return (
     <div 
-      className={`border rounded-md p-3 grid grid-cols-12 items-center gap-4 cursor-pointer transition-all
+      className={`border rounded-md p-2 grid grid-cols-12 items-center gap-3 cursor-pointer transition-all
                 ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}
       onClick={() => onSelect(feature.id)}
     >
@@ -35,19 +35,19 @@ const FeatureConfigCard: React.FC<FeatureConfigCardProps> = ({
         <Switch
           checked={feature.enabled}
           onCheckedChange={() => onToggle(feature.id)}
-          className={`data-[state=checked]:bg-orange-500`}
+          className="data-[state=checked]:bg-orange-500 scale-85"
           onClick={(e) => e.stopPropagation()}
         />
       </div>
       
-      <div className="col-span-7 font-medium">
+      <div className="col-span-7 text-sm font-medium">
         {feature.name}
       </div>
       
       <div className="col-span-3">
         <input
           type="number"
-          className="w-full rounded border-gray-300 px-3 py-1 text-right"
+          className="w-full rounded border border-gray-300 px-2 py-1 text-right text-sm"
           value={feature.weight}
           onChange={(e) => {
             const value = parseInt(e.target.value) || 0;
@@ -61,7 +61,7 @@ const FeatureConfigCard: React.FC<FeatureConfigCardProps> = ({
       </div>
       
       <div className="col-span-1 flex justify-center">
-        <ChevronRight className="h-5 w-5 text-gray-400" />
+        <ChevronRight className="h-4 w-4 text-gray-400" />
       </div>
     </div>
   );

@@ -22,23 +22,23 @@ const RulesConfigCard: React.FC<RulesConfigCardProps> = ({
   onWeightChange,
 }) => {
   return (
-    <div className="border rounded-md p-3 grid grid-cols-12 items-center gap-4 hover:bg-gray-50">
+    <div className="border rounded-md p-2 grid grid-cols-12 items-center gap-3 hover:bg-gray-50">
       <div className="col-span-1">
         <Switch
           checked={rule.enabled}
           onCheckedChange={() => onToggle(rule.id)}
-          className={`data-[state=checked]:bg-orange-500`}
+          className="data-[state=checked]:bg-orange-500 scale-85"
         />
       </div>
       
-      <div className="col-span-7 font-medium">
+      <div className="col-span-7 text-sm font-medium">
         {rule.name}
       </div>
       
       <div className="col-span-4">
         <input
           type="number"
-          className="w-full rounded border-gray-300 px-3 py-1 text-right"
+          className="w-full rounded border border-gray-300 px-2 py-1 text-right text-sm"
           value={rule.weight}
           onChange={(e) => {
             const value = parseInt(e.target.value) || 0;

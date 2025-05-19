@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link } from 'react-router-dom';
 import { toast } from "sonner";
 import { useAuth, UserRole } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import FeatureConfigCard from '../components/FeatureConfigCard';
 import RulesConfigCard from '../components/RulesConfigCard';
 import { Button } from '../components/ui/button';
-import { Save } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 
 interface RiskConfigurationParams {
   role: UserRole;
@@ -18,6 +18,8 @@ interface Feature {
   name: string;
   enabled: boolean;
   weight: number;
+  category: string;
+  subCategory: string;
   rules?: Rule[];
 }
 
@@ -38,48 +40,99 @@ const RiskConfiguration: React.FC = () => {
       id: 'meta-data-analytics', 
       name: 'Meta Data Analytics', 
       enabled: true, 
-      weight: 25 
+      weight: 25,
+      category: 'Clinical',
+      subCategory: 'Claims Related'
     },
     { 
       id: 'entity-analytics', 
       name: 'Entity Analytics', 
       enabled: false, 
-      weight: 0 
+      weight: 0,
+      category: 'Clinical',
+      subCategory: 'Claims Related'
     },
     { 
       id: 'stamp-data-analytics', 
       name: 'Stamp Data Analytics', 
       enabled: true, 
-      weight: 25 
+      weight: 25,
+      category: 'Clinical',
+      subCategory: 'Policy Related'
     },
     { 
       id: 'class-mismatch', 
       name: 'Class Mismatch', 
       enabled: false, 
-      weight: 1 
+      weight: 0,
+      category: 'Clinical',
+      subCategory: 'Entity Related'
     },
     { 
       id: 'matchings', 
       name: 'Matchings', 
       enabled: false, 
-      weight: 1 
+      weight: 0,
+      category: 'Non-Clinical',
+      subCategory: 'Claims Related'
     },
     { 
       id: 'tampering-analytics', 
       name: 'Tampering Analytics', 
       enabled: true, 
-      weight: 25 
+      weight: 25,
+      category: 'Non-Clinical',
+      subCategory: 'Policy Related'
+    },
+    { 
+      id: 'data-verification', 
+      name: 'Data Verification', 
+      enabled: true, 
+      weight: 25,
+      category: 'Non-Clinical',
+      subCategory: 'Entity Related'
     }
   ]);
 
   const [selectedFeature, setSelectedFeature] = useState<string | null>('meta-data-analytics');
   const [rules, setRules] = useState<Rule[]>([
-    { id: 'rule-1', name: 'Missing Creation Date', enabled: true, weight: 5, featureId: 'meta-data-analytics' },
-    { id: 'rule-2', name: 'Missing Author', enabled: true, weight: 5, featureId: 'meta-data-analytics' },
-    { id: 'rule-3', name: 'Missing Modification Date', enabled: true, weight: 5, featureId: 'meta-data-analytics' },
-    { id: 'rule-4', name: 'Missing Title', enabled: true, weight: 5, featureId: 'meta-data-analytics' },
-    { id: 'rule-5', name: 'Missing Creator', enabled: true, weight: 5, featureId: 'meta-data-analytics' },
-    { id: 'rule-6', name: 'Missing Producer', enabled: true, weight: 5, featureId: 'meta-data-analytics' }
+    { id: 'rule-1', name: 'Missing Creation Date', enabled: true, weight: 15, featureId: 'meta-data-analytics' },
+    { id: 'rule-2', name: 'Missing Author', enabled: true, weight: 15, featureId: 'meta-data-analytics' },
+    { id: 'rule-3', name: 'Missing Modification Date', enabled: true, weight: 15, featureId: 'meta-data-analytics' },
+    { id: 'rule-4', name: 'Missing Title', enabled: true, weight: 15, featureId: 'meta-data-analytics' },
+    { id: 'rule-5', name: 'Missing Creator', enabled: true, weight: 20, featureId: 'meta-data-analytics' },
+    { id: 'rule-6', name: 'Missing Producer', enabled: true, weight: 20, featureId: 'meta-data-analytics' },
+    
+    { id: 'rule-7', name: 'Invalid Entity Type', enabled: true, weight: 25, featureId: 'entity-analytics' },
+    { id: 'rule-8', name: 'Entity Format Error', enabled: true, weight: 25, featureId: 'entity-analytics' },
+    { id: 'rule-9', name: 'Missing Entity ID', enabled: true, weight: 25, featureId: 'entity-analytics' },
+    { id: 'rule-10', name: 'Invalid Entity Status', enabled: true, weight: 25, featureId: 'entity-analytics' },
+    
+    { id: 'rule-11', name: 'Invalid Stamp Format', enabled: true, weight: 20, featureId: 'stamp-data-analytics' },
+    { id: 'rule-12', name: 'Missing Stamp Date', enabled: true, weight: 20, featureId: 'stamp-data-analytics' },
+    { id: 'rule-13', name: 'Invalid Stamp Authority', enabled: true, weight: 20, featureId: 'stamp-data-analytics' },
+    { id: 'rule-14', name: 'Expired Stamp', enabled: true, weight: 20, featureId: 'stamp-data-analytics' },
+    { id: 'rule-15', name: 'Stamp Verification Failed', enabled: true, weight: 20, featureId: 'stamp-data-analytics' },
+    
+    { id: 'rule-16', name: 'Class Definition Error', enabled: true, weight: 33, featureId: 'class-mismatch' },
+    { id: 'rule-17', name: 'Class Type Mismatch', enabled: true, weight: 33, featureId: 'class-mismatch' },
+    { id: 'rule-18', name: 'Invalid Class Reference', enabled: true, weight: 34, featureId: 'class-mismatch' },
+    
+    { id: 'rule-19', name: 'Field Match Error', enabled: true, weight: 25, featureId: 'matchings' },
+    { id: 'rule-20', name: 'Record Match Failed', enabled: true, weight: 25, featureId: 'matchings' },
+    { id: 'rule-21', name: 'Entity Match Exception', enabled: true, weight: 25, featureId: 'matchings' },
+    { id: 'rule-22', name: 'Match Timeout', enabled: true, weight: 25, featureId: 'matchings' },
+    
+    { id: 'rule-23', name: 'Document Alteration Detected', enabled: true, weight: 20, featureId: 'tampering-analytics' },
+    { id: 'rule-24', name: 'Signature Tampering', enabled: true, weight: 20, featureId: 'tampering-analytics' },
+    { id: 'rule-25', name: 'Data Inconsistency', enabled: true, weight: 20, featureId: 'tampering-analytics' },
+    { id: 'rule-26', name: 'Metadata Tampering', enabled: true, weight: 20, featureId: 'tampering-analytics' },
+    { id: 'rule-27', name: 'Historical Record Altered', enabled: true, weight: 20, featureId: 'tampering-analytics' },
+    
+    { id: 'rule-28', name: 'Format Validation Failed', enabled: true, weight: 25, featureId: 'data-verification' },
+    { id: 'rule-29', name: 'Data Source Verification', enabled: true, weight: 25, featureId: 'data-verification' },
+    { id: 'rule-30', name: 'Checksum Validation Failed', enabled: true, weight: 25, featureId: 'data-verification' },
+    { id: 'rule-31', name: 'Cross-Reference Error', enabled: true, weight: 25, featureId: 'data-verification' }
   ]);
 
   // Listen for sidebar expansion/collapse
@@ -170,25 +223,30 @@ const RiskConfiguration: React.FC = () => {
       <Sidebar />
       
       <div className={`flex-1 overflow-auto transition-all duration-300 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
-        <div className="p-6 h-full">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-semibold">Risk Configuration</h1>
+        <div className="p-4 h-full">
+          <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
-              <Button onClick={handleSave} className="flex items-center gap-2">
-                <Save size={16} />
+              <Link to={`/risk-management/${role}`} className="text-blue-600 hover:text-blue-700">
+                <ArrowLeft size={18} />
+              </Link>
+              <h1 className="text-xl font-semibold">Risk Configuration</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleSave} className="flex items-center gap-1 text-sm py-1.5 px-3 h-auto">
+                <Save size={14} />
                 Save
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Features Section */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-medium mb-4">Configuration Features</h2>
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <h2 className="text-base font-medium mb-3">Configuration Features</h2>
               
-              <div className="mb-4 grid grid-cols-2 gap-4">
-                <div className="font-medium text-gray-700">Feature Name</div>
-                <div className="font-medium text-gray-700 text-right">Weightage</div>
+              <div className="mb-3 grid grid-cols-2 gap-4">
+                <div className="text-sm font-medium text-gray-700">Feature Name</div>
+                <div className="text-sm font-medium text-gray-700 text-right">Weightage</div>
               </div>
               
               <div className="space-y-2 max-h-[calc(100vh-350px)] overflow-y-auto pr-2">
@@ -204,13 +262,13 @@ const RiskConfiguration: React.FC = () => {
                 ))}
               </div>
               
-              <div className="mt-6 border-t border-gray-200 pt-4">
-                <div className={`flex justify-between text-lg font-medium ${featuresTotalClass}`}>
+              <div className="mt-4 border-t border-gray-200 pt-3">
+                <div className={`flex justify-between text-base font-medium ${featuresTotalClass}`}>
                   <span>Total Config Rules %</span>
                   <span>{featuresTotal}</span>
                 </div>
                 {featuresTotal !== 100 && (
-                  <div className="text-red-500 text-sm mt-1">
+                  <div className="text-red-500 text-xs mt-1">
                     Total Config Rules % must be 100
                   </div>
                 )}
@@ -219,14 +277,14 @@ const RiskConfiguration: React.FC = () => {
 
             {/* Rules Section */}
             {selectedFeature && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-lg font-medium mb-4">
+              <div className="bg-white rounded-lg shadow-sm p-4">
+                <h2 className="text-base font-medium mb-3">
                   {features.find(f => f.id === selectedFeature)?.name} Rules
                 </h2>
                 
-                <div className="mb-4 grid grid-cols-2 gap-4">
-                  <div className="font-medium text-gray-700">Rule Name</div>
-                  <div className="font-medium text-gray-700 text-right">Weightage</div>
+                <div className="mb-3 grid grid-cols-2 gap-4">
+                  <div className="text-sm font-medium text-gray-700">Rule Name</div>
+                  <div className="text-sm font-medium text-gray-700 text-right">Weightage</div>
                 </div>
                 
                 <div className="space-y-2 max-h-[calc(100vh-350px)] overflow-y-auto pr-2">
@@ -240,13 +298,13 @@ const RiskConfiguration: React.FC = () => {
                   ))}
                 </div>
                 
-                <div className="mt-6 border-t border-gray-200 pt-4">
-                  <div className={`flex justify-between text-lg font-medium ${rulesTotalClass}`}>
+                <div className="mt-4 border-t border-gray-200 pt-3">
+                  <div className={`flex justify-between text-base font-medium ${rulesTotalClass}`}>
                     <span>Total Config Rules %</span>
                     <span>{rulesTotal}</span>
                   </div>
                   {rulesTotal !== 100 && (
-                    <div className="text-red-500 text-sm mt-1">
+                    <div className="text-red-500 text-xs mt-1">
                       Total Config Rules % must be 100
                     </div>
                   )}
